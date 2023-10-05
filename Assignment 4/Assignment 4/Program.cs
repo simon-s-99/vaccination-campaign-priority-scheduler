@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
+/* 
+ * 
+
+
+*/
 namespace Vaccination
 {
     public class Program
@@ -12,9 +17,34 @@ namespace Vaccination
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            Console.WriteLine("Hello!");
+            while (true)
+            {
+                int mainMenu = ShowMenu("Vad vill du göra?", new[]
+                {
+                    "Skapa prioritetsordning ",
+                    "Schemalägg vaccinationer",
+                    "Ändra antal vaccindoser",
+                    "Ändra åldersgräns",
+                    "Ändra indatafil",
+                    "Ändra utdatafil",
+                    "Avsluta"
+                });
+                Console.Clear();
+
+                if (mainMenu == 0)
+                {
+                    AddVaccineDosages();
+                }
+            }
         }
 
+        public static int AddVaccineDosages()
+        {
+            Console.WriteLine("Ändra antal vaccindoser");
+            Console.WriteLine("-----------------");
+            Console.Write("Ange nytt antal doser: ");
+            int vaccineDosages = int.Parse(Console.ReadLine());
+        }
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
         //
         // Parameters:
@@ -104,7 +134,7 @@ namespace Vaccination
             Console.CursorVisible = true;
             return selected;
         }
-    }
+    }  
 
     [TestClass]
     public class ProgramTests
