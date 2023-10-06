@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 /* 
  * 
@@ -13,12 +14,25 @@ namespace Vaccination
 {
     public class Program
     {
+        private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
+        private static bool vaccinateChildren = false;
+
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             while (true)
             {
+                Console.WriteLine("Huvudmeny");
+                Console.WriteLine("----------");
+                Console.WriteLine($"Antal tillängliga vaccindoser {vaccineDosages}");
+
+                string ageRestriction = vaccinateChildren ? "ja" : "nej";
+                Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
+                Console.WriteLine("Indatafil: ");
+                Console.WriteLine("Utdatafil: ");
+                Console.WriteLine();
+
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
                     "Skapa prioritetsordning ",
@@ -33,18 +47,86 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    AddVaccineDosages();
+                    //Prioritesordning
+                }
+                if (mainMenu == 1)
+                {
+                    //Schemalägg vaccinationer
+                }
+
+                if (mainMenu == 2)
+                {
+                    vaccineDosages = ChangeVaccineDosages();
+                    Console.Clear();
+                }
+                if (mainMenu == 3)
+                {
+                    vaccinateChildren = ChangeAgeRequirement();
+                    Console.Clear();
+                }
+                if (mainMenu == 4)
+                {
+                    //Ändra indatafil
+                }
+                if (mainMenu == 5)
+                {
+                    //Ändra utdatafil
+                }
+                if (mainMenu == 6)
+                {
+                    Console.WriteLine("Exiting program. Goodbye!");
+                    Console.WriteLine();
+                    break; 
                 }
             }
         }
 
-        public static int AddVaccineDosages()
+        public static int ChangeVaccineDosages()
         {
-            Console.WriteLine("Ändra antal vaccindoser");
-            Console.WriteLine("-----------------");
-            Console.Write("Ange nytt antal doser: ");
-            int vaccineDosages = int.Parse(Console.ReadLine());
+            while (true)
+            {
+                Console.WriteLine("Ändra antal vaccindoser");
+                Console.WriteLine("-----------------");
+                Console.Write("Ange nytt antal doser: ");
+
+                try
+                {
+                    int NewVaccineDosages = int.Parse(Console.ReadLine());
+                    Console.WriteLine($"Nytt antal vaccindoser: {NewVaccineDosages}");
+                    return NewVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Vänligen ange vaccindoseringarna i heltal.");
+                    Console.WriteLine();
+                    Console.WriteLine("Tryck på valfi knapp för att försöka igen");
+                    Console.ReadKey(); // Wait for the user to press any key.
+                    //Thread.Sleep(2000);
+                    Console.Clear();    
+                }            
+            }
         }
+
+        public static bool ChangeAgeRequirement()
+        {
+            
+            int ageMenu = ShowMenu("Ska personer under 18 vaccineras?", new[]
+            {
+                "Ja",
+                "Nej"
+            });
+            if (ageMenu == 0)
+            {
+                vaccinateChildren = true;
+            }
+            else
+            {
+                vaccinateChildren = false;
+            }
+
+            return vaccinateChildren; //Returns the new updated vaccination age.
+        }
+
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
         //
         // Parameters:
