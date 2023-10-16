@@ -15,6 +15,7 @@ namespace Vaccination
 {
     public class Program
     {
+        // Maybe remove these vv (evaluate) 
         private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
         private static bool vaccinateChildren = false;
 
@@ -37,7 +38,7 @@ namespace Vaccination
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
                     "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer",
+                    "Schemalägg vaccinationer", // <-- fr. VG-delen 
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
@@ -50,37 +51,38 @@ namespace Vaccination
                 {
                     //Prioritesordning
                 }
-                if (mainMenu == 1)
+                else if (mainMenu == 1)
                 {
                     //Schemalägg vaccinationer
                 }
 
-                if (mainMenu == 2)
+                else if (mainMenu == 2)
                 {
                     vaccineDosages = ChangeVaccineDosages();
                     Console.Clear();
                 }
-                if (mainMenu == 3)
+                else if (mainMenu == 3)
                 {
                     vaccinateChildren = ChangeAgeRequirement();
                     Console.Clear();
                 }
-                if (mainMenu == 4)
+                else if (mainMenu == 4)
                 {
                     //Ändra indatafil
                 }
-                if (mainMenu == 5)
+                else if (mainMenu == 5)
                 {
                     //Ändra utdatafil
                 }
-                if (mainMenu == 6)
+                else 
                 {
+                    Console.Clear();
                     Console.WriteLine("Exiting program. Goodbye!");
                     Console.WriteLine();
-                    break; 
+                    break; // breaks main-loop 
                 }
-            }
-        }
+            } // <-- end of Main-loop 
+        } // <-- end of Main() 
 
         public static int ChangeVaccineDosages()
         {
