@@ -22,6 +22,9 @@ namespace Vaccination
             int vaccineDosages = 0; 
             bool vaccinateChildren = false;
 
+            string inputCSVFilepath = string.Empty;
+            string outputCSVFilepath = string.Empty;
+
             while (true)
             {
                 Console.WriteLine("Huvudmeny");
@@ -30,8 +33,8 @@ namespace Vaccination
 
                 string ageRestriction = vaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
-                Console.WriteLine("Indatafil: ");
-                Console.WriteLine("Utdatafil: ");
+                Console.WriteLine($"Indatafil: {inputCSVFilepath}");
+                Console.WriteLine($"Utdatafil: {outputCSVFilepath}");
                 Console.WriteLine();
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
@@ -48,11 +51,12 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    //Prioritesordning
+                    // Prioritesordning
                 }
                 else if (mainMenu == 1)
                 {
-                    //Schemalägg vaccinationer
+                    // Schemalägg vaccinationer
+                    // schemalägg är fr. VG-delen 
                 }
 
                 else if (mainMenu == 2)
@@ -67,11 +71,11 @@ namespace Vaccination
                 }
                 else if (mainMenu == 4)
                 {
-                    //Ändra indatafil
+                    // Ändra indatafil
                 }
                 else if (mainMenu == 5)
                 {
-                    //Ändra utdatafil
+                    // Ändra utdatafil
                 }
                 else 
                 {
@@ -123,6 +127,13 @@ namespace Vaccination
             {
                 return false;
             }
+        }
+
+        public static string ChangeFilePath()
+        {
+
+
+            return ""; // temp 
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
