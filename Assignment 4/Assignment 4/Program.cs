@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -15,13 +16,15 @@ namespace Vaccination
 {
     public class Program
     {
-        // Maybe remove these vv (evaluate) 
-        private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
-        private static bool vaccinateChildren = false;
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+            int vaccineDosages = 0; 
+            bool vaccinateChildren = false;
+
+            string inputCSVFilepath = string.Empty;
+            string outputCSVFilepath = string.Empty;
 
             while (true)
             {
@@ -31,8 +34,8 @@ namespace Vaccination
 
                 string ageRestriction = vaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
-                Console.WriteLine("Indatafil: ");
-                Console.WriteLine("Utdatafil: ");
+                Console.WriteLine($"Indatafil: {inputCSVFilepath}");
+                Console.WriteLine($"Utdatafil: {outputCSVFilepath}");
                 Console.WriteLine();
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
@@ -49,11 +52,12 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    //Prioritesordning
+                    // Prioritesordning
                 }
                 else if (mainMenu == 1)
                 {
-                    //Schemalägg vaccinationer
+                    // Schemalägg vaccinationer
+                    // schemalägg är fr. VG-delen 
                 }
 
                 else if (mainMenu == 2)
@@ -68,11 +72,11 @@ namespace Vaccination
                 }
                 else if (mainMenu == 4)
                 {
-                    //Ändra indatafil
+                    ChangeFilePath(isOutputFilePath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    //Ändra utdatafil
+                    ChangeFilePath(isOutputFilePath: true);
                 }
                 else 
                 {
@@ -114,16 +118,69 @@ namespace Vaccination
                 "Ja",
                 "Nej"
             });
+
+            //Returns the new updated vaccination age. 
             if (ageMenu == 0)
             {
-                vaccinateChildren = true;
+                return true;
             }
             else
             {
-                vaccinateChildren = false;
+                return false;
             }
+        }
 
-            return vaccinateChildren; //Returns the new updated vaccination age.
+        // ChangeFilePath lets the user enter a filepath and makes sure it is valid
+        public static string ChangeFilePath(bool isOutputFilePath)
+        {
+            while (true)
+            {
+                Console.Write("Ny filsökväg: ");
+                string newPath = Console.ReadLine().Trim();
+
+                char[] invalidPathChars = Path.GetInvalidPathChars();
+                bool containsInvalidChars = false;
+                foreach (char c in invalidPathChars)
+                {
+                    if (newPath.Contains(c))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
+                        Console.WriteLine("(Exempel på ogiltiga tecken: " +
+                            string.Join(' ', invalidPathChars) + ")");
+                        Console.WriteLine();
+                        break; // breaks foreach loop 
+                    }
+                }
+                if (containsInvalidChars) { continue; } // starts new iteration of this methods main-loop
+
+                // might need to change this if we enter a fully qualified filepath (with an actual FILE-name)
+                // might throw error if a directory is not the final target for path 
+                if (Directory.Exists(newPath))
+                {
+                    if (isOutputFilePath) { return newPath; }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
+                    Console.WriteLine();
+                    continue; // starts new iteration for this methods main-loop 
+                }
+
+                // guard clause for inputFilepath handling, maybe not needed 
+                if (!isOutputFilePath)
+                {
+                    if (File.Exists(newPath)) { return newPath; }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
+                        Console.WriteLine();
+                        // continue not needed, this is the last if-statement 
+                    }
+                }
+            }
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
