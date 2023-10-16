@@ -129,11 +129,25 @@ namespace Vaccination
             }
         }
 
-        public static string ChangeFilePath()
+        public static string ChangeFilePath(bool isOutputFilePath)
         {
+            string rPath = string.Empty;
+
+            Console.Clear();
+            Console.Write("Ny filsökväg: ");
+            string newPath = Console.ReadLine();
+
+            // do handling for outputfilepath first
+
+            if (isOutputFilePath)
+            {
+                return rPath;
+            }
+
+            // handling for inputFilepath here 
 
 
-            return ""; // temp 
+            return rPath;  
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
