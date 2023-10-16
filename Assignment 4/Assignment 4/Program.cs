@@ -2,14 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
+// Samuel Lööf & Simon Sörqvist, uppgift 4
+
 /* 
- * 
+ * hej :)
+ */
 
-
-*/
 namespace Vaccination
 {
     public class Person
@@ -22,12 +24,15 @@ namespace Vaccination
     }
     public class Program
     {
-        private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
-        private static bool vaccinateChildren = false;
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+            int vaccineDosages = 0; 
+            bool vaccinateChildren = false;
+
+            string inputCSVFilepath = string.Empty;
+            string outputCSVFilepath = string.Empty;
 
             while (true)
             {
@@ -37,14 +42,14 @@ namespace Vaccination
 
                 string ageRestriction = vaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
-                Console.WriteLine("Indatafil: ");
-                Console.WriteLine("Utdatafil: ");
+                Console.WriteLine($"Indatafil: {inputCSVFilepath}");
+                Console.WriteLine($"Utdatafil: {outputCSVFilepath}");
                 Console.WriteLine();
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
                     "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer",
+                    "Schemalägg vaccinationer", // <-- fr. VG-delen 
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
@@ -55,39 +60,41 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    //Prioritesordning
+                    // Prioritesordning
                 }
-                if (mainMenu == 1)
+                else if (mainMenu == 1)
                 {
-                    //Schemalägg vaccinationer
+                    // Schemalägg vaccinationer
+                    // schemalägg är fr. VG-delen 
                 }
 
-                if (mainMenu == 2)
+                else if (mainMenu == 2)
                 {
                     vaccineDosages = ChangeVaccineDosages();
                     Console.Clear();
                 }
-                if (mainMenu == 3)
+                else if (mainMenu == 3)
                 {
                     vaccinateChildren = ChangeAgeRequirement();
                     Console.Clear();
                 }
-                if (mainMenu == 4)
+                else if (mainMenu == 4)
                 {
-                    //Ändra indatafil
+                    ChangeFilePath(isOutputFilePath: false);
                 }
-                if (mainMenu == 5)
+                else if (mainMenu == 5)
                 {
-                    //Ändra utdatafil
+                    ChangeFilePath(isOutputFilePath: true);
                 }
-                if (mainMenu == 6)
+                else 
                 {
+                    Console.Clear();
                     Console.WriteLine("Exiting program. Goodbye!");
                     Console.WriteLine();
-                    break; 
+                    break; // breaks main-loop 
                 }
-            }
-        }
+            } // <-- end of Main-loop 
+        } // <-- end of Main() 
 
         public static int ChangeVaccineDosages()
         {
@@ -99,40 +106,89 @@ namespace Vaccination
 
                 try
                 {
-                    int NewVaccineDosages = int.Parse(Console.ReadLine());
-                    Console.WriteLine($"Nytt antal vaccindoser: {NewVaccineDosages}");
-                    return NewVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
+                    int newVaccineDosages = int.Parse(Console.ReadLine());
+                    Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
+                    return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
                 {
+                    Console.Clear();    
                     Console.WriteLine("Vänligen ange vaccindoseringarna i heltal.");
                     Console.WriteLine();
-                    Console.WriteLine("Tryck på valfi knapp för att försöka igen");
-                    Console.ReadKey(); // Wait for the user to press any key.
-                    //Thread.Sleep(2000);
-                    Console.Clear();    
                 }            
             }
         }
 
         public static bool ChangeAgeRequirement()
         {
-            
             int ageMenu = ShowMenu("Ska personer under 18 vaccineras?", new[]
             {
                 "Ja",
                 "Nej"
             });
+
+            //Returns the new updated vaccination age. 
             if (ageMenu == 0)
             {
-                vaccinateChildren = true;
+                return true;
             }
             else
             {
-                vaccinateChildren = false;
+                return false;
             }
+        }
 
-            return vaccinateChildren; //Returns the new updated vaccination age.
+        // ChangeFilePath lets the user enter a filepath and makes sure it is valid
+        public static string ChangeFilePath(bool isOutputFilePath)
+        {
+            while (true)
+            {
+                Console.Write("Ny filsökväg: ");
+                string newPath = Console.ReadLine().Trim();
+
+                char[] invalidPathChars = Path.GetInvalidPathChars();
+                bool containsInvalidChars = false;
+                foreach (char c in invalidPathChars)
+                {
+                    if (newPath.Contains(c))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
+                        Console.WriteLine("(Exempel på ogiltiga tecken: " +
+                            string.Join(' ', invalidPathChars) + ")");
+                        Console.WriteLine();
+                        break; // breaks foreach loop 
+                    }
+                }
+                if (containsInvalidChars) { continue; } // starts new iteration of this methods main-loop
+
+                // might need to change this if we enter a fully qualified filepath (with an actual FILE-name)
+                // might throw error if a directory is not the final target for path 
+                if (Directory.Exists(newPath))
+                {
+                    if (isOutputFilePath) { return newPath; }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
+                    Console.WriteLine();
+                    continue; // starts new iteration for this methods main-loop 
+                }
+
+                // guard clause for inputFilepath handling, maybe not needed 
+                if (!isOutputFilePath)
+                {
+                    if (File.Exists(newPath)) { return newPath; }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
+                        Console.WriteLine();
+                        // continue not needed, this is the last if-statement 
+                    }
+                }
+            }
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
@@ -224,13 +280,24 @@ namespace Vaccination
             Console.CursorVisible = true;
             return selected;
         }
-    }  
+    }
 
     [TestClass]
-    public class ProgramTests
+    public class UnitTests
     {
         [TestMethod]
-        public void ExampleTest()
+        public void exTest()
+        {
+
+        }
+    }
+
+    // Jakobs tests vv
+    [TestClass]
+    public class BasicTests
+    {
+        [TestMethod]
+        public void BaseFunctionalityTest()
         {
             // Arrange
             string[] input =
@@ -250,4 +317,5 @@ namespace Vaccination
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
     }
+    // Jakobs tests ^^^
 }
