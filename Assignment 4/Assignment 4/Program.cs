@@ -5,11 +5,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 
+// Samuel Lööf & Simon Sörqvist, uppgift 4
+
 /* 
- * 
+ * hej :)
+ */
 
-
-*/
 namespace Vaccination
 {
     public class Program
@@ -91,25 +92,21 @@ namespace Vaccination
 
                 try
                 {
-                    int NewVaccineDosages = int.Parse(Console.ReadLine());
-                    Console.WriteLine($"Nytt antal vaccindoser: {NewVaccineDosages}");
-                    return NewVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
+                    int newVaccineDosages = int.Parse(Console.ReadLine());
+                    Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
+                    return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
                 {
+                    Console.Clear();    
                     Console.WriteLine("Vänligen ange vaccindoseringarna i heltal.");
                     Console.WriteLine();
-                    Console.WriteLine("Tryck på valfi knapp för att försöka igen");
-                    Console.ReadKey(); // Wait for the user to press any key.
-                    //Thread.Sleep(2000);
-                    Console.Clear();    
                 }            
             }
         }
 
         public static bool ChangeAgeRequirement()
         {
-            
             int ageMenu = ShowMenu("Ska personer under 18 vaccineras?", new[]
             {
                 "Ja",
@@ -216,13 +213,24 @@ namespace Vaccination
             Console.CursorVisible = true;
             return selected;
         }
-    }  
+    }
 
     [TestClass]
-    public class ProgramTests
+    public class UnitTests
     {
         [TestMethod]
-        public void ExampleTest()
+        public void exTest()
+        {
+
+        }
+    }
+
+    // Jakobs tests vv
+    [TestClass]
+    public class BasicTests
+    {
+        [TestMethod]
+        public void BaseFunctionalityTest()
         {
             // Arrange
             string[] input =
@@ -242,4 +250,5 @@ namespace Vaccination
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
     }
+    // Jakobs tests ^^^
 }
