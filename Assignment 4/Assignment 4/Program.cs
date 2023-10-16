@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -71,11 +72,11 @@ namespace Vaccination
                 }
                 else if (mainMenu == 4)
                 {
-                    // Ändra indatafil
+                    ChangeFilePath(isOutputFilePath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    // Ändra utdatafil
+                    ChangeFilePath(isOutputFilePath: true);
                 }
                 else 
                 {
@@ -131,23 +132,47 @@ namespace Vaccination
 
         public static string ChangeFilePath(bool isOutputFilePath)
         {
-            string rPath = string.Empty;
-
-            Console.Clear();
-            Console.Write("Ny filsökväg: ");
-            string newPath = Console.ReadLine();
-
-            // do handling for outputfilepath first
-
-            if (isOutputFilePath)
+            while (true)
             {
-                return rPath;
+                Console.Write("Ny filsökväg: ");
+                string newPath = Console.ReadLine().Trim();
+
+                char[] invalidPathChars = Path.GetInvalidPathChars();
+                bool containsInvalidChars = false;
+                foreach (char c in invalidPathChars)
+                {
+                    if (newPath.Contains(c))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
+                        Console.WriteLine("(Exempel på ogiltiga tecken: " +
+                            string.Join(' ', invalidPathChars) + ")");
+                        Console.WriteLine();
+                        break; // breaks foreach loop 
+                    }
+                }
+                if (containsInvalidChars) { continue; } // starts new iteration of this methods main-loop
+
+                // might need to change this if we enter a fully qualified filepath (with an actual FILE-name)
+                // might throw error if a directory is not the final target for path 
+                if (Directory.Exists(newPath))
+                {
+                    if (isOutputFilePath) { return newPath; }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
+                    Console.WriteLine();
+                    continue; // starts new iteration for this methods main-loop 
+                }
+
+                //
+                // handling for inputFilepath here 
+                // 
+
+                return newPath;  
             }
-
-            // handling for inputFilepath here 
-
-
-            return rPath;  
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
