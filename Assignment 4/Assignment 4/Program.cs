@@ -12,6 +12,14 @@ using System.Threading;
 */
 namespace Vaccination
 {
+    public class Person
+    {
+        public int Age = 0;
+        public bool WorksInHealthcare = false;
+        public bool IsInRiskGroup = false;
+        public bool HasHadInfection = false;
+        public bool HasHadFirstDose = false;
+    }
     public class Program
     {
         private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
