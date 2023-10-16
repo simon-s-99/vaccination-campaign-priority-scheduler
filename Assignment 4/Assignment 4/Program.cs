@@ -15,13 +15,12 @@ namespace Vaccination
 {
     public class Program
     {
-        // Maybe remove these vv (evaluate) 
-        private static int vaccineDosages = 0; //To be able to store vaccineDosages we added a class variable for it.
-        private static bool vaccinateChildren = false;
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+            int vaccineDosages = 0; 
+            bool vaccinateChildren = false;
 
             while (true)
             {
@@ -114,16 +113,16 @@ namespace Vaccination
                 "Ja",
                 "Nej"
             });
+
+            //Returns the new updated vaccination age. 
             if (ageMenu == 0)
             {
-                vaccinateChildren = true;
+                return true;
             }
             else
             {
-                vaccinateChildren = false;
+                return false;
             }
-
-            return vaccinateChildren; //Returns the new updated vaccination age.
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
