@@ -216,13 +216,24 @@ namespace Vaccination
             Console.CursorVisible = true;
             return selected;
         }
-    }  
+    }
 
     [TestClass]
-    public class ProgramTests
+    public class UnitTests
     {
         [TestMethod]
-        public void ExampleTest()
+        public void exTest()
+        {
+
+        }
+    }
+
+    // Jakobs tests vv
+    [TestClass]
+    public class BasicTests
+    {
+        [TestMethod]
+        public void BaseFuntionalityTest()
         {
             // Arrange
             string[] input =
@@ -242,4 +253,5 @@ namespace Vaccination
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
     }
+    // Jakobs tests ^^^
 }
