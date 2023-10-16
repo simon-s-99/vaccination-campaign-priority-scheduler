@@ -130,6 +130,7 @@ namespace Vaccination
             }
         }
 
+        // ChangeFilePath lets the user enter a filepath and makes sure it is valid
         public static string ChangeFilePath(bool isOutputFilePath)
         {
             while (true)
@@ -167,11 +168,18 @@ namespace Vaccination
                     continue; // starts new iteration for this methods main-loop 
                 }
 
-                //
-                // handling for inputFilepath here 
-                // 
-
-                return newPath;  
+                // guard clause for inputFilepath handling, maybe not needed 
+                if (!isOutputFilePath)
+                {
+                    if (File.Exists(newPath)) { return newPath; }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
+                        Console.WriteLine();
+                        // continue not needed, this is the last if-statement 
+                    }
+                }
             }
         }
 
