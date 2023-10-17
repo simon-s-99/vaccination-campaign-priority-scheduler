@@ -16,19 +16,16 @@ namespace Vaccination
 {
     public class Person
     {
-        public int Age = 0;
-        public string IdentificationNumber = "20200101 - 1111";
+        public string IdentificationNumber = "20200101-1111";
         public string FirstName = "Brad";
         public string LastName = "Pitt";
         public bool WorksInHealthcare = false;
         public bool IsInRiskGroup = false;
         public bool HasHadInfection = false;
-        public bool HasHadFirstDose = false;
+        //public bool HasHadFirstDose = false;
     }
     public class Program
     {
-        private static string csvPath = @"C:\Windows\Temp";
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -41,6 +38,8 @@ namespace Vaccination
 
             while (true)
             {
+                Console.Clear();
+
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
                 Console.WriteLine($"Antal tillängliga vaccindoser {doses}");
@@ -76,20 +75,18 @@ namespace Vaccination
                 else if (mainMenu == 2)
                 {
                     doses = ChangeVaccineDosages();
-                    Console.Clear();
                 }
                 else if (mainMenu == 3)
                 {
                     vaccinateChildren = ChangeAgeRequirement();
-                    Console.Clear();
                 }
                 else if (mainMenu == 4)
                 {
-                    ChangeFilePath(isOutputFilePath: false);
+                    inputCSVFilepath = ChangeFilePath(isOutputFilePath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    ChangeFilePath(isOutputFilePath: true);
+                    outputCSVFilepath = ChangeFilePath(isOutputFilePath: true);
                 }
                 else
                 {
@@ -148,37 +145,61 @@ namespace Vaccination
         //Allows correctly formatted invalid paths.
         public static string ChangeFilePath(bool isOutputFilePath)
         {
+            char[] invalidPathChars = Path.GetInvalidPathChars();
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+            bool containsInvalidChars = false;
+
             while (true)
             {
+                containsInvalidChars = false; // "reset" this bool on each iteration 
+
+                if (isOutputFilePath)
+                {
+                    Console.WriteLine("Ändra indatafil.");
+                }
+                else
+                {
+                    Console.WriteLine("Ändra utdatafil.");
+                }
+
+                Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
-                char[] invalidPathChars = Path.GetInvalidPathChars();
-                bool containsInvalidChars = false;
                 foreach (char c in invalidPathChars)
                 {
-                    if (newPath.Contains(c))
+                    if (newPath.Contains(c)) { containsInvalidChars = true; }
+                }
+                // kinda bad, should only check FILENAME not entire path (ex.: check only file1.txt)
+                /*if (!isOutputFilePath)
+                {
+                    foreach (char c in invalidFileNameChars)
                     {
-                        containsInvalidChars = true; // Set to true if invalid characters are found
+                        if (newPath.Contains(c)) { containsInvalidChars = true; }
+                    }
+                }*/
+
+                if (containsInvalidChars)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
+                    Console.WriteLine();
+                    continue; // starts new iteration of while-loop 
+                }
+
+                if (isOutputFilePath)
+                {
+                    if (Directory.Exists(newPath)) { return newPath; }
+                    else
+                    {
                         Console.Clear();
-                        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
-                        Console.WriteLine("(Exempel på ogiltiga tecken: " +
-                            string.Join(' ', invalidPathChars) + ")");
+                        Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
                         Console.WriteLine();
-                        break;
                     }
                 }
-                if (containsInvalidChars) { continue; }
-
-                // Check if the directory exists
-                if (Directory.Exists(newPath))
+                else
                 {
-                    if (isOutputFilePath) { return newPath; } // Return the directory path
-                }
-                else if (!isOutputFilePath)
-                {
-                    // Check if the file exists
-                    if (File.Exists(newPath)) { return newPath; } // Return the file path
+                    if (File.Exists(newPath)) { return newPath; }
                     else
                     {
                         Console.Clear();
@@ -186,12 +207,47 @@ namespace Vaccination
                         Console.WriteLine();
                     }
                 }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
-                    Console.WriteLine();
-                }
+
+
+                //char[] invalidPathChars = Path.GetInvalidPathChars();
+                //bool containsInvalidChars = false;
+                //foreach (char c in invalidPathChars)
+                //{
+                //    if (newPath.Contains(c))
+                //    {
+                //        containsInvalidChars = true; // Set to true if invalid characters are found
+                //        Console.Clear();
+                //        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
+                //        Console.WriteLine("(Exempel på ogiltiga tecken: " +
+                //            string.Join(' ', invalidPathChars) + ")");
+                //        Console.WriteLine();
+                //        break;
+                //    }
+                //}
+                //if (containsInvalidChars) { continue; }
+
+                //// Check if the directory exists
+                //if (Directory.Exists(newPath))
+                //{
+                //    if (isOutputFilePath) { return newPath; } // Return the directory path
+                //}
+                //else if (!isOutputFilePath)
+                //{
+                //    // Check if the file exists
+                //    if (File.Exists(newPath)) { return newPath; } // Return the file path
+                //    else
+                //    {
+                //        Console.Clear();
+                //        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
+                //        Console.WriteLine();
+                //    }
+                //}
+                //else
+                //{
+                //    Console.Clear();
+                //    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
+                //    Console.WriteLine();
+                //}
             }
         }
     
@@ -269,11 +325,11 @@ namespace Vaccination
 
         public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
-                 return people
-                .OrderByDescending(p => p.WorksInHealthcare)
-                .ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
-                .ThenByDescending(p => p.IsInRiskGroup)
-                .ToList();
+            return people;
+                //.OrderByDescending(p => p.WorksInHealthcare)
+                //.ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
+                //.ThenByDescending(p => p.IsInRiskGroup)
+                //.ToList();
         }
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
