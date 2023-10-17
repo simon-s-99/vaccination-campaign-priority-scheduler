@@ -143,14 +143,8 @@ namespace Vaccination
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
         public static string ChangeFilePath(bool isOutputFilePath)
         {
-            char[] invalidPathChars = Path.GetInvalidPathChars();
-            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
-            bool containsInvalidChars = false;
-
             while (true)
             {
-                //containsInvalidChars = false; // "reset" this bool on each iteration 
-
                 if (isOutputFilePath)
                 {
                     Console.WriteLine("Ändra utdatafil.");
@@ -166,14 +160,21 @@ namespace Vaccination
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
-                    return newPath;
+                    // output does not work haHAA
+                    if (isOutputFilePath) 
+                    {
+                        string tempPath = newPath.Replace(Path.GetFileName(newPath), "");
+                        if (Directory.Exists(tempPath)) { return newPath; }
+                    }
+                    else
+                    {
+                        if (File.Exists(newPath)) { return newPath; }
+                    }
                 }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
-                    Console.WriteLine();
-                }
+                
+                Console.Clear();
+                Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
+                Console.WriteLine();
             }
         }
     
