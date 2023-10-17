@@ -142,6 +142,8 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
+        //Does not display path in main menu.
+        //Allows correctly formatted invalid paths.
         public static string ChangeFilePath(bool isOutputFilePath)
         {
             while (true)
@@ -261,13 +263,12 @@ namespace Vaccination
             List<Person> vaccinationOrder = SortVaccinationOrder(people, vaccinateChildren);
 
 
-
             return new string[0];
         }
 
-        private static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
+        public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
-            return people
+                 return people
                 .OrderByDescending(p => p.WorksInHealthcare)
                 .ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
                 .ThenByDescending(p => p.IsInRiskGroup)
