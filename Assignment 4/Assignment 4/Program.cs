@@ -27,11 +27,13 @@ namespace Vaccination
     }
     public class Program
     {
+        private static string csvPath = @"C:\Windows\Temp";
+
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            int doses = 0; 
+            int doses = 0;
             bool vaccinateChildren = false;
 
             string inputCSVFilepath = string.Empty;
@@ -89,7 +91,7 @@ namespace Vaccination
                 {
                     ChangeFilePath(isOutputFilePath: true);
                 }
-                else 
+                else
                 {
                     Console.Clear();
                     Console.WriteLine("Exiting program. Goodbye!");
@@ -115,10 +117,10 @@ namespace Vaccination
                 }
                 catch (FormatException)
                 {
-                    Console.Clear();    
+                    Console.Clear();
                     Console.WriteLine("Vänligen ange vaccindoseringarna i heltal.");
                     Console.WriteLine();
-                }            
+                }
             }
         }
 
@@ -157,53 +159,52 @@ namespace Vaccination
                 {
                     if (newPath.Contains(c))
                     {
+                        containsInvalidChars = true; // Set to true if invalid characters are found
                         Console.Clear();
                         Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
                         Console.WriteLine("(Exempel på ogiltiga tecken: " +
                             string.Join(' ', invalidPathChars) + ")");
                         Console.WriteLine();
-                        break; // breaks foreach loop 
+                        break;
                     }
                 }
-                if (containsInvalidChars) { continue; } // starts new iteration of this methods main-loop
+                if (containsInvalidChars) { continue; }
 
-                // might need to change this if we enter a fully qualified filepath (with an actual FILE-name)
-                // might throw error if a directory is not the final target for path 
+                // Check if the directory exists
                 if (Directory.Exists(newPath))
                 {
-                    if (isOutputFilePath) { return newPath; }
+                    if (isOutputFilePath) { return newPath; } // Return the directory path
+                }
+                else if (!isOutputFilePath)
+                {
+                    // Check if the file exists
+                    if (File.Exists(newPath)) { return newPath; } // Return the file path
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
+                        Console.WriteLine();
+                    }
                 }
                 else
                 {
                     Console.Clear();
                     Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
                     Console.WriteLine();
-                    continue; // starts new iteration for this methods main-loop 
-                }
-
-                // guard clause for inputFilepath handling, maybe not needed 
-                if (!isOutputFilePath)
-                {
-                    if (File.Exists(newPath)) { return newPath; }
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
-                        Console.WriteLine();
-                        // continue not needed, this is the last if-statement 
-                    }
                 }
             }
         }
+    
+    
 
-        // Create the lines that should be saved to a CSV file after creating the vaccination order.
-        //
-        // Parameters:
-        //
-        // input: the lines from a CSV file containing population information
-        // doses: the number of vaccine doses available
-        // vaccinateChildren: whether to vaccinate people younger than 18
-        public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
+    // Create the lines that should be saved to a CSV file after creating the vaccination order.
+    //
+    // Parameters:
+    //
+    // input: the lines from a CSV file containing population information
+    // doses: the number of vaccine doses available
+    // vaccinateChildren: whether to vaccinate people younger than 18
+    public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
 
             //Read the people info from the CSV file. Example of the formats from the CSV file should look like this :19720906-1111,Elba,Idris,0,0,1 (and) 8102032222,Efternamnsson,Eva,1,1,0
