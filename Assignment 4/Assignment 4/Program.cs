@@ -14,13 +14,24 @@ using System.Threading;
 
 namespace Vaccination
 {
+    public class Person
+    {
+        public int Age = 0;
+        public string IdentificationNumber = "20200101 - 1111";
+        public string FirstName = "Brad";
+        public string LastName = "Pitt";
+        public bool WorksInHealthcare = false;
+        public bool IsInRiskGroup = false;
+        public bool HasHadInfection = false;
+        public bool HasHadFirstDose = false;
+    }
     public class Program
     {
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            int vaccineDosages = 0; 
+            int doses = 0; 
             bool vaccinateChildren = false;
 
             string inputCSVFilepath = string.Empty;
@@ -30,7 +41,7 @@ namespace Vaccination
             {
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
-                Console.WriteLine($"Antal tillängliga vaccindoser {vaccineDosages}");
+                Console.WriteLine($"Antal tillängliga vaccindoser {doses}");
 
                 string ageRestriction = vaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
@@ -62,7 +73,7 @@ namespace Vaccination
 
                 else if (mainMenu == 2)
                 {
-                    vaccineDosages = ChangeVaccineDosages();
+                    doses = ChangeVaccineDosages();
                     Console.Clear();
                 }
                 else if (mainMenu == 3)
@@ -131,6 +142,8 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
+        //Does not display path in main menu.
+        //Allows correctly formatted invalid paths.
         public static string ChangeFilePath(bool isOutputFilePath)
         {
             while (true)
@@ -192,8 +205,74 @@ namespace Vaccination
         // vaccinateChildren: whether to vaccinate people younger than 18
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
-            // Replace with your own code.
+
+            //Read the people info from the CSV file. Example of the formats from the CSV file should look like this :19720906-1111,Elba,Idris,0,0,1 (and) 8102032222,Efternamnsson,Eva,1,1,0
+            //Maybe split boh commas and dashes?
+
+            /* 1. Works in health care
+             * 2. age 65+ (yymmdd)
+             * 3. Risk group.
+             * 4. rest of population
+             * 5. If the user wishes to vaccinate children (under age of 18) then treat them as an adult in the priority list.
+             * 
+             * People who have been infected already should be vaccinated with only one dose. Rest with two.
+             * If there is only one dose left and the next person in the order requires two dosages then this person shouldn't get any dossages at all.
+             * And same goes for the rest of the people after this person even if they only require one dosage.
+             * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made unless the user changes the available dosages them self from the menu.
+             * 
+             
+             * 
+             */
+
+            // Read and parse the CSV data from the input array
+            List<Person> people = new List<Person>();
+
+            foreach (string line in input)
+            {
+                string[] values = line.Split(new[] {','});
+
+                if (values.Length >= 6) // Make sure there are at least 6 values in the array.
+                {
+                    string identificationNumber = values[0];
+                    string firstName = values[1];
+                    string lastName = values[2];
+                    bool worksInHealthcare = values[3] == "1";
+                    bool isInRiskGroup = values[4] == "1";
+                    bool hasHadInfection = values[5] == "1";
+
+                    // If the identification number contains dashes, remove them.
+                    identificationNumber = identificationNumber.Replace("-", "");
+
+                    // Create a Person object
+                    Person person = new Person
+                    {
+                        IdentificationNumber = identificationNumber,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        WorksInHealthcare = worksInHealthcare,
+                        IsInRiskGroup = isInRiskGroup,
+                        HasHadInfection = hasHadInfection
+                    };
+
+                    // Store the person in the list
+                    people.Add(person);
+
+                }     
+            }
+            // Sort the people based on the vaccination priority criteria
+            List<Person> vaccinationOrder = SortVaccinationOrder(people, vaccinateChildren);
+
+
             return new string[0];
+        }
+
+        public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
+        {
+                 return people
+                .OrderByDescending(p => p.WorksInHealthcare)
+                .ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
+                .ThenByDescending(p => p.IsInRiskGroup)
+                .ToList();
         }
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
