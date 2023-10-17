@@ -154,17 +154,29 @@ namespace Vaccination
                     Console.WriteLine("Ändra indatafil.");
                 }
 
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
-                    // output does not work haHAA
                     if (isOutputFilePath) 
                     {
-                        string tempPath = newPath.Replace(Path.GetFileName(newPath), "");
-                        if (Directory.Exists(tempPath)) { return newPath; }
+                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                        if (Directory.Exists(tempPath)) 
+                        {
+                            string fileName = Path.GetFileName(newPath);
+                            string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
+                            if (fileExtension == "txt" || fileExtension == "CSV")
+                            {
+                                return newPath; 
+                            }
+                            else
+                            {
+                                // handle wrong file extension here 
+                            }
+                        }
                     }
                     else
                     {
@@ -255,18 +267,20 @@ namespace Vaccination
         public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
 
-            return people
+            return people;
 
+            /*
             //Priority order for vaccination:
            .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
            .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
            .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
            .ThenByDescending(p => p.Aae) //4. Then by age in order.
                 .ToList();
-
+            */
 
         }
 
+        /*
         public static string IDNumberToAge(string identificationnumber)
         {
             // Remove any dashes or other non-digit characters
@@ -302,6 +316,7 @@ namespace Vaccination
 
         }
     
+        */
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
         {
