@@ -16,8 +16,7 @@ namespace Vaccination
 {
     public class Person
     {
-        public int Age = 0;
-        public string IdentificationNumber = "20200101 - 1111";
+        public string IdentificationNumber = "20200101-1111";
         public string FirstName = "Brad";
         public string LastName = "Pitt";
         public bool WorksInHealthcare = false;
@@ -27,8 +26,6 @@ namespace Vaccination
     }
     public class Program
     {
-        private static string csvPath = @"C:\Windows\Temp";
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -219,7 +216,9 @@ namespace Vaccination
              * People who have been infected already should be vaccinated with only one dose. Rest with two.
              * If there is only one dose left and the next person in the order requires two dosages then this person shouldn't get any dossages at all.
              * And same goes for the rest of the people after this person even if they only require one dosage.
-             * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made unless the user changes the available dosages them self from the menu.
+             *if theres one dose left and the next person only requires one dose they should still be vaccinated.
+             * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made,
+             * unless the user changes the available dosages them self from the menu.
              * 
              
              * 
@@ -269,12 +268,52 @@ namespace Vaccination
 
         public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
-                 return people
-                .OrderByDescending(p => p.WorksInHealthcare)
-                .ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
-                .ThenByDescending(p => p.IsInRiskGroup)
+            return people
+
+            //Priority order for vaccination:
+           .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
+           .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
+           .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
+           .ThenByDescending(p => p.Aae) //4. Then by age in order.
                 .ToList();
+
         }
+
+        public static string IDNumberToAge(string identificationnumber)
+        {
+            // Remove any dashes or other non-digit characters
+            identificationnumber = new string(identificationnumber.Where(char.IsDigit).ToArray());
+
+            string yearPart, monthPart, dayPart;
+
+
+            if (identificationnumber.Length == 10)
+            {
+                yearPart = identificationnumber.Substring(0, 2);
+                monthPart = identificationnumber.Substring(2, 2);
+                dayPart = identificationnumber.Substring(4, 2);
+            }
+            else if (identificationnumber.Length == 12)
+            {
+                yearPart = identificationnumber.Substring(0, 4);
+                monthPart = identificationnumber.Substring(4, 2);
+                dayPart = identificationnumber.Substring(6, 2);
+            }
+            else
+            {
+                Console.WriteLine("Invalid identification number length");
+            }
+            //Get the current date
+            DateTime currentdate = DateTime.Now;
+
+            int year = int.Parse(yearPart);
+            int month = int.Parse(monthPart);
+            int day = int.Parse(dayPart);
+
+
+
+        }
+    
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
         {
