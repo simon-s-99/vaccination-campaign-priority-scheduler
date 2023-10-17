@@ -141,8 +141,6 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
-        //Does not display path in main menu.
-        //Allows correctly formatted invalid paths.
         public static string ChangeFilePath(bool isOutputFilePath)
         {
             char[] invalidPathChars = Path.GetInvalidPathChars();
@@ -151,103 +149,31 @@ namespace Vaccination
 
             while (true)
             {
-                containsInvalidChars = false; // "reset" this bool on each iteration 
+                //containsInvalidChars = false; // "reset" this bool on each iteration 
 
                 if (isOutputFilePath)
                 {
-                    Console.WriteLine("Ändra indatafil.");
+                    Console.WriteLine("Ändra utdatafil.");
                 }
                 else
                 {
-                    Console.WriteLine("Ändra utdatafil.");
+                    Console.WriteLine("Ändra indatafil.");
                 }
 
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
-                foreach (char c in invalidPathChars)
+                if (Path.IsPathFullyQualified(newPath))
                 {
-                    if (newPath.Contains(c)) { containsInvalidChars = true; }
-                }
-                // kinda bad, should only check FILENAME not entire path (ex.: check only file1.txt)
-                /*if (!isOutputFilePath)
-                {
-                    foreach (char c in invalidFileNameChars)
-                    {
-                        if (newPath.Contains(c)) { containsInvalidChars = true; }
-                    }
-                }*/
-
-                if (containsInvalidChars)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
-                    Console.WriteLine();
-                    continue; // starts new iteration of while-loop 
-                }
-
-                if (isOutputFilePath)
-                {
-                    if (Directory.Exists(newPath)) { return newPath; }
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
-                        Console.WriteLine();
-                    }
+                    return newPath;
                 }
                 else
                 {
-                    if (File.Exists(newPath)) { return newPath; }
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
-                        Console.WriteLine();
-                    }
+                    Console.Clear();
+                    Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
+                    Console.WriteLine();
                 }
-
-
-                //char[] invalidPathChars = Path.GetInvalidPathChars();
-                //bool containsInvalidChars = false;
-                //foreach (char c in invalidPathChars)
-                //{
-                //    if (newPath.Contains(c))
-                //    {
-                //        containsInvalidChars = true; // Set to true if invalid characters are found
-                //        Console.Clear();
-                //        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
-                //        Console.WriteLine("(Exempel på ogiltiga tecken: " +
-                //            string.Join(' ', invalidPathChars) + ")");
-                //        Console.WriteLine();
-                //        break;
-                //    }
-                //}
-                //if (containsInvalidChars) { continue; }
-
-                //// Check if the directory exists
-                //if (Directory.Exists(newPath))
-                //{
-                //    if (isOutputFilePath) { return newPath; } // Return the directory path
-                //}
-                //else if (!isOutputFilePath)
-                //{
-                //    // Check if the file exists
-                //    if (File.Exists(newPath)) { return newPath; } // Return the file path
-                //    else
-                //    {
-                //        Console.Clear();
-                //        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
-                //        Console.WriteLine();
-                //    }
-                //}
-                //else
-                //{
-                //    Console.Clear();
-                //    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
-                //    Console.WriteLine();
-                //}
             }
         }
     
