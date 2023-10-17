@@ -16,19 +16,16 @@ namespace Vaccination
 {
     public class Person
     {
-        public int Age = 0;
-        public string IdentificationNumber = "20200101 - 1111";
+        public string IdentificationNumber = "20200101-1111";
         public string FirstName = "Brad";
         public string LastName = "Pitt";
         public bool WorksInHealthcare = false;
         public bool IsInRiskGroup = false;
         public bool HasHadInfection = false;
-        public bool HasHadFirstDose = false;
+        //public bool HasHadFirstDose = false;
     }
     public class Program
     {
-        private static string csvPath = @"C:\Windows\Temp";
-
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -41,6 +38,8 @@ namespace Vaccination
 
             while (true)
             {
+                Console.Clear();
+
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
                 Console.WriteLine($"Antal tillängliga vaccindoser {doses}");
@@ -76,20 +75,18 @@ namespace Vaccination
                 else if (mainMenu == 2)
                 {
                     doses = ChangeVaccineDosages();
-                    Console.Clear();
                 }
                 else if (mainMenu == 3)
                 {
                     vaccinateChildren = ChangeAgeRequirement();
-                    Console.Clear();
                 }
                 else if (mainMenu == 4)
                 {
-                    ChangeFilePath(isOutputFilePath: false);
+                    inputCSVFilepath = ChangeFilePath(isOutputFilePath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    ChangeFilePath(isOutputFilePath: true);
+                    outputCSVFilepath = ChangeFilePath(isOutputFilePath: true);
                 }
                 else
                 {
@@ -144,54 +141,40 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
-        //Does not display path in main menu.
-        //Allows correctly formatted invalid paths.
         public static string ChangeFilePath(bool isOutputFilePath)
         {
             while (true)
             {
-                Console.Write("Ny filsökväg: ");
-                string newPath = Console.ReadLine().Trim();
-
-                char[] invalidPathChars = Path.GetInvalidPathChars();
-                bool containsInvalidChars = false;
-                foreach (char c in invalidPathChars)
+                if (isOutputFilePath)
                 {
-                    if (newPath.Contains(c))
-                    {
-                        containsInvalidChars = true; // Set to true if invalid characters are found
-                        Console.Clear();
-                        Console.WriteLine("Filsökvägen innehåller ogiltiga tecken, försök igen.");
-                        Console.WriteLine("(Exempel på ogiltiga tecken: " +
-                            string.Join(' ', invalidPathChars) + ")");
-                        Console.WriteLine();
-                        break;
-                    }
-                }
-                if (containsInvalidChars) { continue; }
-
-                // Check if the directory exists
-                if (Directory.Exists(newPath))
-                {
-                    if (isOutputFilePath) { return newPath; } // Return the directory path
-                }
-                else if (!isOutputFilePath)
-                {
-                    // Check if the file exists
-                    if (File.Exists(newPath)) { return newPath; } // Return the file path
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Filen finns inte, ange en giltig filsökväg.");
-                        Console.WriteLine();
-                    }
+                    Console.WriteLine("Ändra utdatafil.");
                 }
                 else
                 {
-                    Console.Clear();
-                    Console.WriteLine("Mappen finns inte, ange en giltig filsökväg.");
-                    Console.WriteLine();
+                    Console.WriteLine("Ändra indatafil.");
                 }
+
+                Console.WriteLine("---------------");
+                Console.Write("Ny filsökväg: ");
+                string newPath = Console.ReadLine().Trim();
+
+                if (Path.IsPathFullyQualified(newPath))
+                {
+                    // output does not work haHAA
+                    if (isOutputFilePath) 
+                    {
+                        string tempPath = newPath.Replace(Path.GetFileName(newPath), "");
+                        if (Directory.Exists(tempPath)) { return newPath; }
+                    }
+                    else
+                    {
+                        if (File.Exists(newPath)) { return newPath; }
+                    }
+                }
+                
+                Console.Clear();
+                Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
+                Console.WriteLine();
             }
         }
     
@@ -269,11 +252,11 @@ namespace Vaccination
 
         public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
-                 return people
-                .OrderByDescending(p => p.WorksInHealthcare)
-                .ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
-                .ThenByDescending(p => p.IsInRiskGroup)
-                .ToList();
+            return people;
+                //.OrderByDescending(p => p.WorksInHealthcare)
+                //.ThenBy(p => p.Age >= 65) // Prioritize people aged 65 and older
+                //.ThenByDescending(p => p.IsInRiskGroup)
+                //.ToList();
         }
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
