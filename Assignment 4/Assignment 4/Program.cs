@@ -16,14 +16,36 @@ namespace Vaccination
 {
     public class Person
     {
-        public string IdentificationNumber = "20200101-1111";
-        public string FirstName = "Brad";
-        public string LastName = "Pitt";
-        public bool WorksInHealthcare = false;
-        public bool IsInRiskGroup = false;
-        public bool HasHadInfection = false;
-        //public bool HasHadFirstDose = false;
+        public int Age { get; set; } // maybe use this and set it in the set-part of IDNumber
+        private string idNumber;
+        public string IDNumber
+        {
+            get { return idNumber; }
+            set
+            {
+                // add rules for setting id-number
+                // 950101-1355 should be 19950101-1355
+                // 
+                // do DateTime and age calculation/setting here ?
+            }
+        }
+        public string LastName { get; set; } 
+        public string FirstName { get; set; }
+        public bool WorksInHealthcare { get; set; }
+        public bool IsInRiskGroup { get; set; }
+        public bool HasHadInfection { get; set; }
+
+        public Person(string id, string lastN, string firstN, bool healthC, bool riskG, bool infection) 
+        {
+            IDNumber = id;
+            LastName = lastN;
+            FirstName = firstN;
+            WorksInHealthcare = healthC;
+            IsInRiskGroup = riskG;
+            HasHadInfection = infection;
+        }
     }
+
     public class Program
     {
         public static void Main()
