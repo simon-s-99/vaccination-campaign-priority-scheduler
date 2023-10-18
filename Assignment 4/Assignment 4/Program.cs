@@ -16,6 +16,10 @@ namespace Vaccination
 {
     public class Person
     {
+        // add partial error handling in this class by using get-set ?
+        // ex.: IsInRiskGroup = 3 (should throw error)
+        //      then do throw new ArgumentException 
+
         public int Age { get; set; } // maybe use this and set it in the set-part of IDNumber
         private string idNumber;
         public string IDNumber
