@@ -82,11 +82,11 @@ namespace Vaccination
                 }
                 else if (mainMenu == 4)
                 {
-                    inputCSVFilepath = ChangeFilePath(isOutputFilePath: false);
+                    inputCSVFilepath = ChangeFilePath(isOutputPath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    outputCSVFilepath = ChangeFilePath(isOutputFilePath: true);
+                    outputCSVFilepath = ChangeFilePath(isOutputPath: true);
                 }
                 else
                 {
@@ -141,11 +141,11 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
-        public static string ChangeFilePath(bool isOutputFilePath)
+        public static string ChangeFilePath(bool isOutputPath)
         {
             while (true)
             {
-                if (isOutputFilePath)
+                if (isOutputPath)
                 {
                     Console.WriteLine("Ändra utdatafil.");
                 }
@@ -161,31 +161,34 @@ namespace Vaccination
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
-                    if (isOutputFilePath) 
+                    // get file-extension if there is one
+                    string fileName = Path.GetFileName(newPath);
+                    string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
+
+                    if (isOutputPath) // output handling
                     {
                         string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
                         if (Directory.Exists(tempPath)) 
                         {
-                            string fileName = Path.GetFileName(newPath);
-                            string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
                             if (fileExtension == "txt" || fileExtension == "CSV")
                             {
                                 return newPath; 
                             }
-                            else
-                            {
-                                // handle wrong file extension here 
-                            }
                         }
                     }
-                    else
+                    else // input handling
                     {
-                        if (File.Exists(newPath)) { return newPath; }
+                        if (fileExtension == "txt" || fileExtension == "CSV")
+                        {
+                            if (File.Exists(newPath)) { return newPath; }
+                        }
                     }
                 }
                 
+                // tell user to try again
                 Console.Clear();
-                Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
+                Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.txt/.CSV)");
                 Console.WriteLine();
             }
         }
