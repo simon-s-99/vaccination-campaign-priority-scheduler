@@ -192,7 +192,7 @@ namespace Vaccination
                         string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
                         if (Directory.Exists(tempPath)) 
                         {
-                            if (fileExtension == "txt" || fileExtension == "CSV")
+                            if (fileExtension == "csv" || fileExtension == "CSV")
                             {
                                 return newPath; 
                             }
@@ -200,7 +200,7 @@ namespace Vaccination
                     }
                     else // input handling
                     {
-                        if (fileExtension == "txt" || fileExtension == "CSV")
+                        if (fileExtension == "csv" || fileExtension == "CSV")
                         {
                             if (File.Exists(newPath)) { return newPath; }
                         }
@@ -210,7 +210,7 @@ namespace Vaccination
                 // tell user to try again
                 Console.Clear();
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
-                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.txt/.CSV)");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
                 Console.WriteLine();
             }
         }
