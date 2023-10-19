@@ -37,9 +37,9 @@ namespace Vaccination
         }
         public string LastName { get; private set; } 
         public string FirstName { get; private set; }
-        public bool WorksInHealthcare { get; private set; }
-        public bool IsInRiskGroup { get; private set; }
-        public bool HasHadInfection { get; private set; }
+        public int WorksInHealthcare { get; private set; }
+        public int IsInRiskGroup { get; private set; }
+        public int HasHadInfection { get; private set; }
 
         public Person(string idNr, string lastName, string firstName, 
             int worksInHealthCare, int isInRiskGroup, int hasHadInfection) 
@@ -48,22 +48,22 @@ namespace Vaccination
             LastName = lastName;
             FirstName = firstName;
 
-            if (worksInHealthCare == 1) { WorksInHealthcare = true; }
-            else if (worksInHealthCare == 0) { WorksInHealthcare = false; }
+            if (worksInHealthCare == 1) { WorksInHealthcare = worksInHealthCare; }
+            else if (worksInHealthCare == 0) { WorksInHealthcare = worksInHealthCare; }
             else
             {
                 throw new ArgumentException("Value is not in accepted range.");
             }
 
-            if (isInRiskGroup == 1) { IsInRiskGroup = true; }
-            else if (isInRiskGroup == 0) { IsInRiskGroup = false; }
+            if (isInRiskGroup == 1) { IsInRiskGroup = isInRiskGroup; }
+            else if (isInRiskGroup == 0) { IsInRiskGroup = isInRiskGroup; }
             else
             {
                 throw new ArgumentException("Value is not in accepted range.");
             }
 
-            if (hasHadInfection == 1) { HasHadInfection = true; }
-            else if (hasHadInfection == 0) { HasHadInfection = false; }
+            if (hasHadInfection == 1) { HasHadInfection = hasHadInfection; }
+            else if (hasHadInfection == 0) { HasHadInfection = hasHadInfection; }
             else
             {
                 throw new ArgumentException("Value is not in accepted range.");
@@ -210,7 +210,7 @@ namespace Vaccination
                 {
                     // get file-extension if there is one
                     string fileName = Path.GetFileName(newPath);
-                    string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
+                    string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
                     if (isOutputPath) // output handling
                     {
