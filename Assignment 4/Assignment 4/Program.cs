@@ -210,7 +210,7 @@ namespace Vaccination
                 {
                     // get file-extension if there is one
                     string fileName = Path.GetFileName(newPath);
-                    string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
+                    string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
                     if (isOutputPath) // output handling
                     {
