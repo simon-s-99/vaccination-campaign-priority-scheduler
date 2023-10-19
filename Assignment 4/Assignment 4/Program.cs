@@ -265,29 +265,29 @@ namespace Vaccination
         // vaccinateChildren: whether to vaccinate people younger than 18
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
-   
-            List<Person> people = new List<Person>();
-            // Read and parse the CSV data from the input array
+            // this is the list the method will later return as a string[] 
+            List<Person> sortedPeople = new List<Person>();
 
+            // list where we will store the input from the CSV file
+            List<Person> people = new List<Person>();
+
+            // Read and parse the CSV data from the input array
             foreach (string line in input)
             {
                 string[] values = line.Replace(" ", "").Split(',');
 
-                if (values.Length >= 6) // Make sure there are at least 6 values in the array.
+                if (values.Length == 6) // Make sure there are at least 6 values in the array.
                 {
-                    string identificationNumber = values[0];
-                    string firstName = values[1];
-                    string lastName = values[2];
+                    string idNumber = values[0];
+                    string lastName = values[1];
+                    string firstName = values[2];
                     int worksInHealthcare = int.Parse(values[3]);
                     int isInRiskGroup = int.Parse(values[4]);
                     int hasHadInfection = int.Parse(values[5]);
 
                     // Create a Person object
-
-                    Person person = new Person
-
-                    (
-                        identificationNumber,
+                    Person person = new Person(
+                        idNumber,
                         lastName,
                         firstName,
                         worksInHealthcare,
@@ -295,39 +295,49 @@ namespace Vaccination
                         hasHadInfection
                     );
 
-
                     // Store the person in the list
-                    people.Add(person);
-
-                    // Priority order for vaccination:
-                    //This is overengineered af.
-                    var overSixtyFive = DateTime.Now.Subtract(new TimeSpan(23741, 0, 0, 0));
-
-
-                    people.OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
-                    .ThenBy(p => p.DateOfBirth.CompareTo(overSixtyFive)) // 2.people aged 65 and older
-                    .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
-                    .ThenBy(p => p.DateOfBirth) //4. Then by age in order.
-                            .ToList();
-
-
-                    /* 1. Works in health care
-                     * 2. age 65+ (yymmdd)
-                     * 3. Risk group.
-                     * 4. rest of population
-                     * 5. If the user wishes to vaccinate children (under age of 18) then treat them as an adult in the priority list.
-                     * 
-                     * People who have been infected already should be vaccinated with only one dose. Rest with two.
-                     * If there is only one dose left and the next person in the order requires two dosages then this person shouldn't get any dossages at all.
-                     * And same goes for the rest of the people after this person even if they only require one dosage.
-                     *if theres one dose left and the next person only requires one dose they should still be vaccinated.
-                     * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made,
-                     * unless the user changes the available dosages them self from the menu. * 
-                     */
+                    if (vaccinateChildren)
+                    {
+                        people.Add(person);
+                    }
+                    else
+                    {
+                        if (person.DateOfBirth.AddYears(18) <= DateTime.Now) 
+                        {
+                            people.Add(person);
+                        }
+                    }
                 }
-
-                // Sort the people based on the vaccination priority criteria                
+                else
+                {
+                    // add handling for incorrect amount of fields 
+                    //      (should write to console) 
+                }
             }
+
+            // Sort the people based on the vaccination priority criteria
+            // Priority order for vaccination:
+            // 1. If the person works in healthcare
+            sortedPeople.AddRange(people.Where(p => p.WorksInHealthcare == 1));
+            people = people.Where(p => p.WorksInHealthcare == 0).ToList();
+
+            // 2.people aged 65 and older
+            sortedPeople.AddRange(people.Where(p =>
+                p.DateOfBirth.AddYears(65) <= DateTime.Now));
+            people = people.Where(p => p.DateOfBirth.AddYears(65) > DateTime.Now).ToList();
+
+            // 3. If the person is in a risk group.
+            sortedPeople.AddRange(people.Where(p => p.IsInRiskGroup == 1));
+            people = people.Where(p => p.IsInRiskGroup == 0).ToList();
+
+            // 4. Then by age in order (oldest to youngest).
+            sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
+
+            // fix return value :) 
+            // vvv this is kinda wrong vvv
+            // add return sortedPeople but join all the fields/properties into a complete
+            // string which is then added to a list of strings, then do return stringList.ToArray()
+            
             return new string[0];
         }
       
