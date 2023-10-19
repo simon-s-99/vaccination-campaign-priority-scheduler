@@ -16,14 +16,40 @@ namespace Vaccination
 {
     public class Person
     {
-        public string IdentificationNumber = "20200101-1111";
-        public string FirstName = "Brad";
-        public string LastName = "Pitt";
-        public bool WorksInHealthcare = false;
-        public bool IsInRiskGroup = false;
-        public bool HasHadInfection = false;
-        //public bool HasHadFirstDose = false;
+        // add partial error handling in this class by using get-set ?
+        // ex.: IsInRiskGroup = 3 (should throw error)
+        //      then do throw new ArgumentException 
+
+        public int Age { get; set; } // maybe use this and set it in the set-part of IDNumber
+        private string idNumber;
+        public string IDNumber
+        {
+            get { return idNumber; }
+            set
+            {
+                // add rules for setting id-number
+                // 950101-1355 should be 19950101-1355
+                // 
+                // do DateTime and age calculation/setting here ?
+            }
+        }
+        public string LastName { get; set; } 
+        public string FirstName { get; set; }
+        public bool WorksInHealthcare { get; set; }
+        public bool IsInRiskGroup { get; set; }
+        public bool HasHadInfection { get; set; }
+
+        public Person(string id, string lastN, string firstN, bool healthC, bool riskG, bool infection) 
+        {
+            IDNumber = id;
+            LastName = lastN;
+            FirstName = firstN;
+            WorksInHealthcare = healthC;
+            IsInRiskGroup = riskG;
+            HasHadInfection = infection;
+        }
     }
+
     public class Program
     {
         public static void Main()
@@ -170,7 +196,7 @@ namespace Vaccination
                         string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
                         if (Directory.Exists(tempPath)) 
                         {
-                            if (fileExtension == "txt" || fileExtension == "CSV")
+                            if (fileExtension == "csv" || fileExtension == "CSV")
                             {
                                 return newPath; 
                             }
@@ -178,7 +204,7 @@ namespace Vaccination
                     }
                     else // input handling
                     {
-                        if (fileExtension == "txt" || fileExtension == "CSV")
+                        if (fileExtension == "csv" || fileExtension == "CSV")
                         {
                             if (File.Exists(newPath)) { return newPath; }
                         }
@@ -188,7 +214,7 @@ namespace Vaccination
                 // tell user to try again
                 Console.Clear();
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
-                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.txt/.CSV)");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
                 Console.WriteLine();
             }
         }
