@@ -82,11 +82,11 @@ namespace Vaccination
                 }
                 else if (mainMenu == 4)
                 {
-                    inputCSVFilepath = ChangeFilePath(isOutputFilePath: false);
+                    inputCSVFilepath = ChangeFilePath(isOutputPath: false);
                 }
                 else if (mainMenu == 5)
                 {
-                    outputCSVFilepath = ChangeFilePath(isOutputFilePath: true);
+                    outputCSVFilepath = ChangeFilePath(isOutputPath: true);
                 }
                 else
                 {
@@ -141,11 +141,11 @@ namespace Vaccination
         }
 
         // ChangeFilePath lets the user enter a filepath and makes sure it is valid
-        public static string ChangeFilePath(bool isOutputFilePath)
+        public static string ChangeFilePath(bool isOutputPath)
         {
             while (true)
             {
-                if (isOutputFilePath)
+                if (isOutputPath)
                 {
                     Console.WriteLine("Ändra utdatafil.");
                 }
@@ -154,26 +154,41 @@ namespace Vaccination
                     Console.WriteLine("Ändra indatafil.");
                 }
 
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
-                    // output does not work haHAA
-                    if (isOutputFilePath) 
+                    // get file-extension if there is one
+                    string fileName = Path.GetFileName(newPath);
+                    string fileExtension = fileName.Substring(fileName.IndexOf('.') + 1);
+
+                    if (isOutputPath) // output handling
                     {
-                        string tempPath = newPath.Replace(Path.GetFileName(newPath), "");
-                        if (Directory.Exists(tempPath)) { return newPath; }
+                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                        if (Directory.Exists(tempPath)) 
+                        {
+                            if (fileExtension == "txt" || fileExtension == "CSV")
+                            {
+                                return newPath; 
+                            }
+                        }
                     }
-                    else
+                    else // input handling
                     {
-                        if (File.Exists(newPath)) { return newPath; }
+                        if (fileExtension == "txt" || fileExtension == "CSV")
+                        {
+                            if (File.Exists(newPath)) { return newPath; }
+                        }
                     }
                 }
                 
+                // tell user to try again
                 Console.Clear();
-                Console.WriteLine("Mappen eller filen finns inte, ange en giltig filsökväg.");
+                Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.txt/.CSV)");
                 Console.WriteLine();
             }
         }
@@ -255,18 +270,20 @@ namespace Vaccination
         public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
         {
 
-            return people
+            return people;
 
+            /*
             //Priority order for vaccination:
            .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
            .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
            .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
            .ThenByDescending(p => p.Aae) //4. Then by age in order.
                 .ToList();
-
+            */
 
         }
 
+        /*
         public static string IDNumberToAge(string identificationnumber)
         {
             // Remove any dashes or other non-digit characters
@@ -313,6 +330,7 @@ namespace Vaccination
 
         }
     
+        */
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
         {
