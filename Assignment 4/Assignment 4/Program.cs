@@ -20,7 +20,7 @@ namespace Vaccination
         // ex.: IsInRiskGroup = 3 (should throw error)
         //      then do throw new ArgumentException 
 
-        public int Age { get; set; } // maybe use this and set it in the set-part of IDNumber
+        public DateTime DateOfBirth { get; } // maybe use this and set it in the set-part of IDNumber
         private string idNumber;
         public string IDNumber
         {
