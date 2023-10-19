@@ -31,6 +31,51 @@ namespace Vaccination
                 // 950101-1355 should be 19950101-1355
                 // 
                 // do DateTime and age calculation/setting here ?
+          
+                {
+                    // Remove any dashes or other non-digit characters
+                    IDNumber = new string(IDNumber.Where(char.IsDigit).ToArray());
+
+                    string yearPart = "";
+                    string monthPart = "";
+                    string dayPart = "";
+
+                    if (IDNumber.Length == 10)
+                    {
+                        yearPart = IDNumber.Substring(0, 2);
+                        monthPart = IDNumber.Substring(2, 2);
+                        dayPart = IDNumber.Substring(4, 2);
+                    }
+                    else if (IDNumber.Length == 12)
+                    {
+                        yearPart = IDNumber.Substring(0, 4);
+                        monthPart = IDNumber.Substring(4, 2);
+                        dayPart = IDNumber.Substring(6, 2);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid identification number length");
+                    }
+                    //Get the current date
+                    DateTime currentdate = DateTime.Now;
+
+                    int year = int.Parse(yearPart);
+                    int month = int.Parse(monthPart);
+                    int day = int.Parse(dayPart);
+
+                    // Calculate the birthdate using the year, month, and day
+                    DateTime birthdate = new DateTime(year, month, day);
+
+                    // Calculate the age by subtracting the birthdate from the current date
+                    TimeSpan ageTimeSpan = currentdate - birthdate;
+
+                    // Calculate the age in years
+                    int age = (int)(ageTimeSpan.TotalDays / 365.25); // Account for leap years
+
+                    // Return the age as a string
+                    age.ToString();
+
+                }
             }
         }
         public string LastName { get; set; } 
@@ -123,7 +168,7 @@ namespace Vaccination
                 }
             } // <-- end of Main-loop 
         } // <-- end of Main() 
-
+    
         public static int ChangeVaccineDosages()
         {
             while (true)
@@ -194,11 +239,11 @@ namespace Vaccination
                     if (isOutputPath) // output handling
                     {
                         string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                        if (Directory.Exists(tempPath)) 
+                        if (Directory.Exists(tempPath))
                         {
                             if (fileExtension == "csv" || fileExtension == "CSV")
                             {
-                                return newPath; 
+                                return newPath;
                             }
                         }
                     }
@@ -210,7 +255,7 @@ namespace Vaccination
                         }
                     }
                 }
-                
+
                 // tell user to try again
                 Console.Clear();
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
@@ -218,18 +263,18 @@ namespace Vaccination
                 Console.WriteLine();
             }
         }
-    
-    
 
-    // Create the lines that should be saved to a CSV file after creating the vaccination order.
-    //
-    // Parameters:
-    //
-    // input: the lines from a CSV file containing population information
-    // doses: the number of vaccine doses available
-    // vaccinateChildren: whether to vaccinate people younger than 18
-    public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
-        {
+
+
+        // Create the lines that should be saved to a CSV file after creating the vaccination order.
+        //
+        // Parameters:
+        //
+        // input: the lines from a CSV file containing population information
+        // doses: the number of vaccine doses available
+        // vaccinateChildren: whether to vaccinate people younger than 18
+        public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
+        { 
 
             //Read the people info from the CSV file. Example of the formats from the CSV file should look like this :19720906-1111,Elba,Idris,0,0,1 (and) 8102032222,Efternamnsson,Eva,1,1,0
             //Maybe split boh commas and dashes?
@@ -245,18 +290,22 @@ namespace Vaccination
              * And same goes for the rest of the people after this person even if they only require one dosage.
              *if theres one dose left and the next person only requires one dose they should still be vaccinated.
              * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made,
-             * unless the user changes the available dosages them self from the menu.
-             * 
-             
-             * 
+             * unless the user changes the available dosages them self from the menu. * 
              */
+           
+            //Priority order for vaccination:
+           .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
+           .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
+           .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
+           .ThenByDescending(p => p.Age) //4. Then by age in order.
+                .ToList();
 
             // Read and parse the CSV data from the input array
             List<Person> people = new List<Person>();
 
             foreach (string line in input)
             {
-                string[] values = line.Split(new[] {','});
+                string[] values = line.Split(new[] { ',' });
 
                 if (values.Length >= 6) // Make sure there are at least 6 values in the array.
                 {
@@ -267,97 +316,28 @@ namespace Vaccination
                     bool isInRiskGroup = values[4] == "1";
                     bool hasHadInfection = values[5] == "1";
 
-                    // If the identification number contains dashes, remove them.
-                    identificationNumber = identificationNumber.Replace("-", "");
-
                     // Create a Person object
                     Person person = new Person
-                    {
-                        IdentificationNumber = identificationNumber,
-                        FirstName = firstName,
-                        LastName = lastName,
-                        WorksInHealthcare = worksInHealthcare,
-                        IsInRiskGroup = isInRiskGroup,
-                        HasHadInfection = hasHadInfection
-                    };
+                    (
+                        identificationNumber,
+                        lastName,
+                        firstName,
+                        worksInHealthcare,
+                        isInRiskGroup,
+                        hasHadInfection
+                    );
 
                     // Store the person in the list
                     people.Add(person);
 
-                }     
+                }
+
+                // Sort the people based on the vaccination priority criteria
+
+                return new string[0];
             }
-            // Sort the people based on the vaccination priority criteria
-            List<Person> vaccinationOrder = SortVaccinationOrder(people, vaccinateChildren);
-
-
-            return new string[0];
         }
-
-        public static List<Person> SortVaccinationOrder(List<Person> people, bool vaccinateChildren)
-        {
-
-            return people;
-
-            /*
-            //Priority order for vaccination:
-           .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
-           .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
-           .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
-           .ThenByDescending(p => p.Aae) //4. Then by age in order.
-                .ToList();
-            */
-
-        }
-
-        /*
-        public static string IDNumberToAge(string identificationnumber)
-        {
-            // Remove any dashes or other non-digit characters
-            identificationnumber = new string(identificationnumber.Where(char.IsDigit).ToArray());
-
-            string yearPart = "";
-            string monthPart = "";
-            string dayPart = "";
-
-            if (identificationnumber.Length == 10)
-            {
-                yearPart = identificationnumber.Substring(0, 2);
-                monthPart = identificationnumber.Substring(2, 2);
-                dayPart = identificationnumber.Substring(4, 2);
-            }
-            else if (identificationnumber.Length == 12)
-            {
-                yearPart = identificationnumber.Substring(0, 4);
-                monthPart = identificationnumber.Substring(4, 2);
-                dayPart = identificationnumber.Substring(6, 2);
-            }
-            else
-            {
-                Console.WriteLine("Invalid identification number length");
-            }
-            //Get the current date
-            DateTime currentdate = DateTime.Now;
-
-            int year = int.Parse(yearPart);
-            int month = int.Parse(monthPart);
-            int day = int.Parse(dayPart);
-
-            // Calculate the birthdate using the year, month, and day
-            DateTime birthdate = new DateTime(year, month, day);
-
-            // Calculate the age by subtracting the birthdate from the current date
-            TimeSpan ageTimeSpan = currentdate - birthdate;
-
-            // Calculate the age in years
-            int age = (int)(ageTimeSpan.TotalDays / 365.25); // Account for leap years
-
-            // Return the age as a string
-            return age.ToString();
-
-        }
-    
-        */
-
+      
         public static int ShowMenu(string prompt, IEnumerable<string> options)
         {
             if (options == null || options.Count() == 0)
@@ -435,6 +415,7 @@ namespace Vaccination
             return selected;
         }
     }
+}
 
     [TestClass]
     public class UnitTests
@@ -472,4 +453,3 @@ namespace Vaccination
         }
     }
     // Jakobs tests ^^^
-}
