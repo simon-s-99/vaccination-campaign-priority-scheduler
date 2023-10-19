@@ -20,7 +20,9 @@ namespace Vaccination
         // ex.: IsInRiskGroup = 3 (should throw error)
         //      then do throw new ArgumentException 
 
-        public DateTime DateOfBirth { get; } // maybe use this and set it in the set-part of IDNumber
+
+        // maybe use this and set it in the set-part of IDNumber
+        public DateTime DateOfBirth { get; } 
         private string idNumber;
         public string IDNumber
         {
@@ -39,14 +41,15 @@ namespace Vaccination
         public bool IsInRiskGroup { get; set; }
         public bool HasHadInfection { get; set; }
 
-        public Person(string id, string lastN, string firstN, bool healthC, bool riskG, bool infection) 
+        public Person(string idNr, string lastName, string firstName, 
+            bool worksInHealthCare, bool isInRiskGroup, bool hasHadInfection) 
         {
-            IDNumber = id;
-            LastName = lastN;
-            FirstName = firstN;
-            WorksInHealthcare = healthC;
-            IsInRiskGroup = riskG;
-            HasHadInfection = infection;
+            IDNumber = idNr;
+            LastName = lastName;
+            FirstName = firstName;
+            WorksInHealthcare = worksInHealthCare;
+            IsInRiskGroup = isInRiskGroup;
+            HasHadInfection = hasHadInfection;
         }
     }
 
