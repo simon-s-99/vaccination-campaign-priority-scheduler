@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,68 +17,36 @@ namespace Vaccination
 {
     public class Person
     {
-        // add partial error handling in this class by using get-set ?
-        // ex.: IsInRiskGroup = 3 (should throw error)
-        //      then do throw new ArgumentException 
-
-
-        // maybe use this and set it in the set-part of IDNumber
         public DateTime DateOfBirth { get; private set; } 
         private string idNumber;
         public string IDNumber
         {
             get { return idNumber; }
             set
-            {
-                // add rules for setting id-number
-                // 950101-1355 should be 19950101-1355
-                // 
-                // do DateTime and age calculation/setting here ?
-          
+            {               
+                // Remove any dashes or other non-digit characters
+                string idNr = value.Where(char.IsDigit).ToString();
+
+                int year, month, day;
+
+                if (idNr.Length == 10)
                 {
-                    // Remove any dashes or other non-digit characters
-                    IDNumber = new string(IDNumber.Where(char.IsDigit).ToArray());
-
-                    string yearPart = "";
-                    string monthPart = "";
-                    string dayPart = "";
-
-                    if (IDNumber.Length == 10)
-                    {
-                        yearPart = IDNumber.Substring(0, 2);
-                        monthPart = IDNumber.Substring(2, 2);
-                        dayPart = IDNumber.Substring(4, 2);
-                    }
-                    else if (IDNumber.Length == 12)
-                    {
-                        yearPart = IDNumber.Substring(0, 4);
-                        monthPart = IDNumber.Substring(4, 2);
-                        dayPart = IDNumber.Substring(6, 2);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid identification number length");
-                    }
-                    //Get the current date
-                    DateTime currentdate = DateTime.Now;
-
-                    int year = int.Parse(yearPart);
-                    int month = int.Parse(monthPart);
-                    int day = int.Parse(dayPart);
-
-                    // Calculate the birthdate using the year, month, and day
-                    DateTime birthdate = new DateTime(year, month, day);
-
-                    // Calculate the age by subtracting the birthdate from the current date
-                    TimeSpan ageTimeSpan = currentdate - birthdate;
-
-                    // Calculate the age in years
-                    int age = (int)(ageTimeSpan.TotalDays / 365.25); // Account for leap years
-
-                    // Return the age as a string
-                    age.ToString();
-
+                    idNr = "19" + idNr;
                 }
+
+                if (idNr.Length == 12)
+                {
+                    year = int.Parse(idNr.Substring(0, 4));
+                    month = int.Parse(idNr.Substring(4, 2));
+                    day = int.Parse(idNr.Substring(6, 2));
+                }
+                else
+                {
+                    throw new ArgumentException("Identification number format is invalid.");
+                }
+
+                DateOfBirth = new DateTime(year, month, day);
+                idNumber = idNr.Substring(0, 8) + "-" + idNr.Substring(8);
             }
         }
         public string LastName { get; private set; } 
@@ -295,7 +264,8 @@ namespace Vaccination
         // doses: the number of vaccine doses available
         // vaccinateChildren: whether to vaccinate people younger than 18
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
-        { 
+        {
+            var people = people.orderbydescending(p.WorksinHealthcare);
 
             //Read the people info from the CSV file. Example of the formats from the CSV file should look like this :19720906-1111,Elba,Idris,0,0,1 (and) 8102032222,Efternamnsson,Eva,1,1,0
             //Maybe split boh commas and dashes?
@@ -313,16 +283,16 @@ namespace Vaccination
              * The supply of vaccine dosages should not be allowed to get changed after a priority order have been made,
              * unless the user changes the available dosages them self from the menu. * 
              */
-           
-            //Priority order for vaccination:
-           .OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
-           .ThenBy(p => p.age >= 65) // 2.people aged 65 and older
-           .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
-           .ThenByDescending(p => p.Age) //4. Then by age in order.
-                .ToList();
+
+           // Priority order for vaccination:
+           //.OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
+           //.ThenBy(p => p.age >= 65) // 2.people aged 65 and older
+           //.ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
+           //.ThenByDescending(p => p.Age) //4. Then by age in order.
+           //     .ToList();
 
             // Read and parse the CSV data from the input array
-            List<Person> people = new List<Person>();
+            List <Person> people = new List<Person>();
 
             foreach (string line in input)
             {
@@ -338,29 +308,28 @@ namespace Vaccination
                     bool hasHadInfection = values[5] == "1";
 
                     // Create a Person object
-                    /*
-                    Person person = new Person
+                    
+                    //Person person = new Person
 
-                    (
-                        identificationNumber,
-                        lastName,
-                        firstName,
-                        worksInHealthcare,
-                        isInRiskGroup,
-                        hasHadInfection
-                    );
+                    //(
+                    //    identificationNumber,
+                    //    lastName,
+                    //    firstName,
+                    //    worksInHealthcare,
+                    //    isInRiskGroup,
+                    //    hasHadInfection
+                    //);
 
 
 
-                    // Store the person in the list
+                    //// Store the person in the list
                     //people.Add(person);
 
                 }
 
-                // Sort the people based on the vaccination priority criteria
-
-                return new string[0];
+                // Sort the people based on the vaccination priority criteria                
             }
+            return new string[0];
         }
       
         public static int ShowMenu(string prompt, IEnumerable<string> options)
@@ -440,7 +409,6 @@ namespace Vaccination
             return selected;
         }
     }
-}
 
     [TestClass]
     public class UnitTests
@@ -478,3 +446,6 @@ namespace Vaccination
         }
     }
     // Jakobs tests ^^^
+}
+
+
