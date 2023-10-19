@@ -20,7 +20,9 @@ namespace Vaccination
         // ex.: IsInRiskGroup = 3 (should throw error)
         //      then do throw new ArgumentException 
 
-        public int Age { get; set; } // maybe use this and set it in the set-part of IDNumber
+
+        // maybe use this and set it in the set-part of IDNumber
+        public DateTime DateOfBirth { get; private set; } 
         private string idNumber;
         public string IDNumber
         {
@@ -33,20 +35,39 @@ namespace Vaccination
                 // do DateTime and age calculation/setting here ?
             }
         }
-        public string LastName { get; set; } 
-        public string FirstName { get; set; }
-        public bool WorksInHealthcare { get; set; }
-        public bool IsInRiskGroup { get; set; }
-        public bool HasHadInfection { get; set; }
+        public string LastName { get; private set; } 
+        public string FirstName { get; private set; }
+        public bool WorksInHealthcare { get; private set; }
+        public bool IsInRiskGroup { get; private set; }
+        public bool HasHadInfection { get; private set; }
 
-        public Person(string id, string lastN, string firstN, bool healthC, bool riskG, bool infection) 
+        public Person(string idNr, string lastName, string firstName, 
+            int worksInHealthCare, int isInRiskGroup, int hasHadInfection) 
         {
-            IDNumber = id;
-            LastName = lastN;
-            FirstName = firstN;
-            WorksInHealthcare = healthC;
-            IsInRiskGroup = riskG;
-            HasHadInfection = infection;
+            IDNumber = idNr;
+            LastName = lastName;
+            FirstName = firstName;
+
+            if (worksInHealthCare == 1) { WorksInHealthcare = true; }
+            else if (worksInHealthCare == 0) { WorksInHealthcare = false; }
+            else
+            {
+                throw new ArgumentException("Value is not in accepted range.");
+            }
+
+            if (isInRiskGroup == 1) { IsInRiskGroup = true; }
+            else if (isInRiskGroup == 0) { IsInRiskGroup = false; }
+            else
+            {
+                throw new ArgumentException("Value is not in accepted range.");
+            }
+
+            if (hasHadInfection == 1) { HasHadInfection = true; }
+            else if (hasHadInfection == 0) { HasHadInfection = false; }
+            else
+            {
+                throw new ArgumentException("Value is not in accepted range.");
+            }
         }
     }
 
@@ -271,6 +292,7 @@ namespace Vaccination
                     identificationNumber = identificationNumber.Replace("-", "");
 
                     // Create a Person object
+                    /*
                     Person person = new Person
                     {
                         IdentificationNumber = identificationNumber,
@@ -280,9 +302,10 @@ namespace Vaccination
                         IsInRiskGroup = isInRiskGroup,
                         HasHadInfection = hasHadInfection
                     };
+                    */
 
                     // Store the person in the list
-                    people.Add(person);
+                    //people.Add(person);
 
                 }     
             }
