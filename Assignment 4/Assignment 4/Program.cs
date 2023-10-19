@@ -304,11 +304,11 @@ namespace Vaccination
                     var overSixtyFive = DateTime.Now.Subtract(new TimeSpan(23741, 0, 0, 0));
 
 
-                    people.OrderByDescending(p => p.WorksInHealthcare) //1. If the person works in healthcare
+                     people.OrderByDescending(p => p.WorksInHealthcare == 1) //1. If the person works in healthcare
                     .ThenBy(p => p.DateOfBirth.CompareTo(overSixtyFive)) // 2.people aged 65 and older
                     .ThenByDescending(p => p.IsInRiskGroup) //3. If the person is in a risk group.
                     .ThenBy(p => p.DateOfBirth) //4. Then by age in order.
-                            .ToList();
+                    .ToList();
 
 
                     /* 1. Works in health care
