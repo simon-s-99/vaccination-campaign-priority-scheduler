@@ -272,8 +272,9 @@ namespace Vaccination
             // Remove any dashes or other non-digit characters
             identificationnumber = new string(identificationnumber.Where(char.IsDigit).ToArray());
 
-            string yearPart, monthPart, dayPart;
-
+            string yearPart = "";
+            string monthPart = "";
+            string dayPart = "";
 
             if (identificationnumber.Length == 10)
             {
@@ -298,7 +299,17 @@ namespace Vaccination
             int month = int.Parse(monthPart);
             int day = int.Parse(dayPart);
 
+            // Calculate the birthdate using the year, month, and day
+            DateTime birthdate = new DateTime(year, month, day);
 
+            // Calculate the age by subtracting the birthdate from the current date
+            TimeSpan ageTimeSpan = currentdate - birthdate;
+
+            // Calculate the age in years
+            int age = (int)(ageTimeSpan.TotalDays / 365.25); // Account for leap years
+
+            // Return the age as a string
+            return age.ToString();
 
         }
     
