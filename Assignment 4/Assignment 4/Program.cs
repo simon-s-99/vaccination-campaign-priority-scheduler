@@ -15,6 +15,10 @@ using System.Threading;
  * Dokumentation.
  * Omorganisera metoderna i rätt ordning.
  * 
+ * Change rules for 0/1 , move them from constructor to set ? 
+ * 
+ * Fix wrong input format handling in CreateVaccinationOrder() 
+ * 
  */
 
 
@@ -279,6 +283,8 @@ namespace Vaccination
             {
                 string[] values = line.Replace(" ", "").Split(',');
 
+                bool incorrectFormat = false;
+
                 if (values.Length == 6) // Make sure there are at least 6 values in the array.
                 {
                     string idNumber = values[0];
@@ -288,33 +294,41 @@ namespace Vaccination
                     int isInRiskGroup = int.Parse(values[4]);
                     int hasHadInfection = int.Parse(values[5]);
 
-                    // Create a Person object
-                    Person person = new Person(
-                        idNumber,
-                        lastName,
-                        firstName,
-                        worksInHealthcare,
-                        isInRiskGroup,
-                        hasHadInfection
-                    );
+                    try
+                    {
+                        // Create a Person object
+                        Person person = new Person(
+                            idNumber,
+                            lastName,
+                            firstName,
+                            worksInHealthcare,
+                            isInRiskGroup,
+                            hasHadInfection
+                        );
 
-                    // Store the person in the list
-                    if (vaccinateChildren)
-                    {
-                        people.Add(person);
-                    }
-                    else
-                    {
-                        if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
+                        // Store the person in the list
+                        if (vaccinateChildren)
                         {
                             people.Add(person);
                         }
+                        else
+                        {
+                            if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
+                            {
+                                people.Add(person);
+                            }
+                        }
+                    }
+                    catch 
+                    {
+                        incorrectFormat = true;
                     }
                 }
-                else
+
+                if (values.Length != 6 || incorrectFormat)
                 {
                     // add handling for incorrect amount of fields 
-                    //      (should write to console) 
+                    //      (should write to console) (or to an outputarray ?)
                 }
             }
 
