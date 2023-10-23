@@ -8,6 +8,15 @@ using System.Linq;
 using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
+/*
+ * Tjo!
+ * 
+ * Skriv 5 - 10 tester som testar en metod.
+ * Dokumentation.
+ * Omorganisera metoderna i rätt ordning.
+ * 
+ */
+
 
 namespace Vaccination
 {
@@ -20,9 +29,11 @@ namespace Vaccination
             get { return idNumber; }
             set
             {
+
                 // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
                 string idNr = value.Replace("-", "").Replace("+", "").Trim();
                 
+
                 int year, month, day;
 
                 if (idNr.Length == 10)
@@ -121,7 +132,11 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    // Prioritesordning
+                    string[] inputCSV = File.ReadAllLines(inputCSVFilepath);
+
+                    string[] priorityOrder = CreateVaccinationOrder(inputCSV, doses, vaccinateChildren);
+
+                    PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                 }
                 else if (mainMenu == 1)
                 {
@@ -154,7 +169,7 @@ namespace Vaccination
                 }
             } // <-- end of Main-loop 
         } // <-- end of Main() 
-    
+
         public static int ChangeVaccineDosages()
         {
             while (true)
@@ -250,8 +265,6 @@ namespace Vaccination
             }
         }
 
-
-
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
@@ -292,7 +305,7 @@ namespace Vaccination
                     }
                     else
                     {
-                        if (person.DateOfBirth.AddYears(18) <= DateTime.Now) 
+                        if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
                         {
                             people.Add(person);
                         }
@@ -323,16 +336,19 @@ namespace Vaccination
             // 4. Then by age in order (oldest to youngest).
             sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
 
+
             // Return-list
             var output = new List<string>();
             foreach (Person person in sortedPeople)
+
             {
                 int administeredDose = 2; // default state is 2 doses 
                 if (person.HasHadInfection == 1) { administeredDose = 1; }
 
+
                 if (doses >= 2 || (doses == 1 && person.HasHadInfection == 1))
                 {
-                    string line =  $"{person.IDNumber},{person.LastName}," +
+                    string line = $"{person.IDNumber},{person.LastName}," +
                         $"{person.FirstName},{administeredDose}";
                     output.Add(line);
                     doses -= administeredDose;
@@ -342,9 +358,43 @@ namespace Vaccination
                     break; // break loop when doses run out 
                 }
             }
-            
+
             return output.ToArray(); // return as array 
+
         }
+
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filepath)
+        {
+            if (File.Exists(filepath))
+            {
+
+                int overwriteMenu = ShowMenu($" Filen existerar redan. Vill du skriva över den?", new[]
+                {
+                "Ja",
+                "Nej"
+            });
+
+                Console.Clear();
+
+                if (overwriteMenu == 0)
+                {
+                    File.WriteAllLines(filepath, priorityOrder);
+                    Console.WriteLine("Prioritetsordningen har sparats.");
+                }
+                else
+                {
+                    Console.WriteLine("Filen har inte sparats.");
+                }
+
+            }
+            else
+            {
+                File.WriteAllLines(filepath, priorityOrder);
+                Console.WriteLine("Prioritetsordningen har sparats.");
+            }
+          
+        }
+
         public static int VaccinationSchedule()
         {
             /*The first vaccination should take place on a date selected by the user.
