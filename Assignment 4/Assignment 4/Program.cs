@@ -23,10 +23,11 @@ namespace Vaccination
         {
             get { return idNumber; }
             set
-            {               
+            {
                 // Remove any dashes or other non-digit characters
-                string idNr = value.Where(char.IsDigit).ToString();
-
+                //string idNr = value.Where(char.IsDigit).ToString();
+                string idNr = value.Replace("-", "").Replace("+", "").Trim();
+                
                 int year, month, day;
 
                 if (idNr.Length == 10)
@@ -333,12 +334,20 @@ namespace Vaccination
             // 4. Then by age in order (oldest to youngest).
             sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
 
-            // fix return value :) 
-            // vvv this is kinda wrong vvv
-            // add return sortedPeople but join all the fields/properties into a complete
-            // string which is then added to a list of strings, then do return stringList.ToArray()
+            // Return-list
+            var output = new List<string>();
+            foreach (Person person in sortedPeople)
+            {
+                if (doses >= 2)
+                {
+                    string line =  $"{person.IDNumber}, {person.LastName}, " +
+                        $"{person.FirstName}, 2";
+                    output.Add(line);
+                    doses -= 2;
+                }
+            }
             
-            return new string[0];
+            return output.ToArray(); // return as array 
         }
       
         public static int ShowMenu(string prompt, IEnumerable<string> options)
@@ -423,17 +432,6 @@ namespace Vaccination
     public class UnitTests
     {
         [TestMethod]
-        public void exTest()
-        {
-
-        }
-    }
-
-    // Jakobs tests vv
-    [TestClass]
-    public class BasicTests
-    {
-        [TestMethod]
         public void BaseFunctionalityTest()
         {
             // Arrange
@@ -454,7 +452,5 @@ namespace Vaccination
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
     }
-    // Jakobs tests ^^^
 }
-
 
