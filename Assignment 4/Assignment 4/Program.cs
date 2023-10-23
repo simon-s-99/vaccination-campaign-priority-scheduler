@@ -363,36 +363,30 @@ namespace Vaccination
 
         }
 
-        public static void PriorityOrderToCSV(string[] priorityOrder, string filepath)
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
         {
-            if (File.Exists(filepath))
+            if (File.Exists(filePath))
             {
-
-                int overwriteMenu = ShowMenu($" Filen existerar redan. Vill du skriva över den?", new[]
+                int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
                 {
-                "Ja",
-                "Nej"
-            });
+                    "Ja",
+                    "Nej"
+                });
 
                 Console.Clear();
 
-                if (overwriteMenu == 0)
-                {
-                    File.WriteAllLines(filepath, priorityOrder);
-                    Console.WriteLine("Prioritetsordningen har sparats.");
-                }
-                else
+                if (overwriteMenu == 1) 
                 {
                     Console.WriteLine("Filen har inte sparats.");
+                    Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
+                    Console.WriteLine();
+                    return;
                 }
-
             }
-            else
-            {
-                File.WriteAllLines(filepath, priorityOrder);
-                Console.WriteLine("Prioritetsordningen har sparats.");
-            }
-          
+            
+            File.WriteAllLines(filePath, priorityOrder);
+            Console.WriteLine("Prioritetsordningen har sparats.");
+            Console.WriteLine();
         }
 
         public static int VaccinationSchedule()
