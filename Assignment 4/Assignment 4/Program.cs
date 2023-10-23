@@ -328,7 +328,7 @@ namespace Vaccination
                 if (values.Length != 6 || incorrectFormat)
                 {
                     // add handling for incorrect amount of fields 
-                    //      (should write to console) (or to an outputarray ?)
+                    // (or to an outputarray ?)
                 }
             }
 
@@ -374,7 +374,6 @@ namespace Vaccination
             }
 
             return output.ToArray(); // return as array 
-
         }
 
         public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
