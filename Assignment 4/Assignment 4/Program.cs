@@ -15,6 +15,10 @@ using System.Threading;
  * Dokumentation.
  * Omorganisera metoderna i rätt ordning.
  * 
+ * Change rules for 0/1 , move them from constructor to set ? 
+ * 
+ * Fix wrong input format handling in CreateVaccinationOrder() 
+ * 
  */
 
 
@@ -29,9 +33,8 @@ namespace Vaccination
             get { return idNumber; }
             set
             {
-                // Remove any dashes or other non-digit characters
 
-                //string idNr = value.Where(char.IsDigit).ToString();
+                // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
                 string idNr = value.Replace("-", "").Replace("+", "").Trim();
                 
 
@@ -280,6 +283,8 @@ namespace Vaccination
             {
                 string[] values = line.Replace(" ", "").Split(',');
 
+                bool incorrectFormat = false;
+
                 if (values.Length == 6) // Make sure there are at least 6 values in the array.
                 {
                     string idNumber = values[0];
@@ -289,33 +294,41 @@ namespace Vaccination
                     int isInRiskGroup = int.Parse(values[4]);
                     int hasHadInfection = int.Parse(values[5]);
 
-                    // Create a Person object
-                    Person person = new Person(
-                        idNumber,
-                        lastName,
-                        firstName,
-                        worksInHealthcare,
-                        isInRiskGroup,
-                        hasHadInfection
-                    );
+                    try
+                    {
+                        // Create a Person object
+                        Person person = new Person(
+                            idNumber,
+                            lastName,
+                            firstName,
+                            worksInHealthcare,
+                            isInRiskGroup,
+                            hasHadInfection
+                        );
 
-                    // Store the person in the list
-                    if (vaccinateChildren)
-                    {
-                        people.Add(person);
-                    }
-                    else
-                    {
-                        if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
+                        // Store the person in the list
+                        if (vaccinateChildren)
                         {
                             people.Add(person);
                         }
+                        else
+                        {
+                            if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
+                            {
+                                people.Add(person);
+                            }
+                        }
+                    }
+                    catch 
+                    {
+                        incorrectFormat = true;
                     }
                 }
-                else
+
+                if (values.Length != 6 || incorrectFormat)
                 {
                     // add handling for incorrect amount of fields 
-                    //      (should write to console) 
+                    // (or to an outputarray ?)
                 }
             }
 
@@ -361,39 +374,32 @@ namespace Vaccination
             }
 
             return output.ToArray(); // return as array 
-
         }
 
-        public static void PriorityOrderToCSV(string[] priorityOrder, string filepath)
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
         {
-            if (File.Exists(filepath))
+            if (File.Exists(filePath))
             {
-
-                int overwriteMenu = ShowMenu($" Filen existerar redan. Vill du skriva över den?", new[]
+                int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
                 {
-                "Ja",
-                "Nej"
-            });
+                    "Ja",
+                    "Nej"
+                });
 
                 Console.Clear();
 
-                if (overwriteMenu == 0)
-                {
-                    File.WriteAllLines(filepath, priorityOrder);
-                    Console.WriteLine("Prioritetsordningen har sparats.");
-                }
-                else
+                if (overwriteMenu == 1) 
                 {
                     Console.WriteLine("Filen har inte sparats.");
+                    Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
+                    Console.WriteLine();
+                    return;
                 }
-
             }
-            else
-            {
-                File.WriteAllLines(filepath, priorityOrder);
-                Console.WriteLine("Prioritetsordningen har sparats.");
-            }
-          
+            
+            File.WriteAllLines(filePath, priorityOrder);
+            Console.WriteLine("Prioritetsordningen har sparats.");
+            Console.WriteLine();
         }
 
         public static int VaccinationSchedule()
