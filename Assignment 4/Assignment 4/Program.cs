@@ -20,8 +20,7 @@ namespace Vaccination
             get { return idNumber; }
             set
             {
-                // Remove any dashes or other non-digit characters
-                //string idNr = value.Where(char.IsDigit).ToString();
+                // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
                 string idNr = value.Replace("-", "").Replace("+", "").Trim();
                 
                 int year, month, day;
