@@ -9,10 +9,6 @@ using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 
-/* 
- * hej :)
- */
-
 namespace Vaccination
 {
     public class Person
@@ -258,12 +254,6 @@ namespace Vaccination
 
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
-        //
-        // Parameters:
-        //
-        // input: the lines from a CSV file containing population information
-        // doses: the number of vaccine doses available
-        // vaccinateChildren: whether to vaccinate people younger than 18
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
             // this is the list the method will later return as a string[] 
