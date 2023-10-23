@@ -11,6 +11,8 @@ using System.Threading;
 
 /* 
  * hej :)
+ * 
+ * 
  */
 
 namespace Vaccination
@@ -26,6 +28,7 @@ namespace Vaccination
             {               
                 // Remove any dashes or other non-digit characters
                 string idNr = value.Where(char.IsDigit).ToString();
+
 
                 int year, month, day;
 
@@ -333,6 +336,16 @@ namespace Vaccination
             // 4. Then by age in order (oldest to youngest).
             sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
 
+            List<string> output = new List<string>();
+
+            foreach (var person in sortedPeople)
+            {
+                if (doses >= 2)
+                {
+
+                }
+
+            }
             // fix return value :) 
             // vvv this is kinda wrong vvv
             // add return sortedPeople but join all the fields/properties into a complete
@@ -345,8 +358,31 @@ namespace Vaccination
             }).ToList();
 
             // Convert the list of strings to a string array and return it.
-            return result.ToArray();
+            
+                return result.ToArray();
         }
+
+        public static void PrioirtyOrderToCSV()
+        {
+            int overwriteMenu = ShowMenu($" Filen existerar redan. Vill du skriva över den?", new[]
+            {
+                "Ja",
+                "nej"
+            });
+
+            Console.Clear();
+
+            if (overwriteMenu == 0)
+            {
+
+            }
+            else
+            {
+                Console.WriteLine("Filen har inte sparats."):
+            }
+          
+        }
+
         public static int VaccinationSchedule()
         {
             /*The first vaccination should take place on a date selected by the user.
