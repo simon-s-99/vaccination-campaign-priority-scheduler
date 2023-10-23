@@ -338,12 +338,19 @@ namespace Vaccination
             var output = new List<string>();
             foreach (Person person in sortedPeople)
             {
-                if (doses >= 2)
+                int administeredDose = 2; // default state is 2 doses 
+                if (person.HasHadInfection == 1) { administeredDose = 1; }
+
+                if (doses >= 2 || (doses == 1 && person.HasHadInfection == 1))
                 {
-                    string line =  $"{person.IDNumber}, {person.LastName}, " +
-                        $"{person.FirstName}, 2";
+                    string line =  $"{person.IDNumber},{person.LastName}," +
+                        $"{person.FirstName},{administeredDose}";
                     output.Add(line);
-                    doses -= 2;
+                    doses -= administeredDose;
+                }
+                else
+                {
+                    break; // break loop when doses run out 
                 }
             }
             
@@ -432,7 +439,7 @@ namespace Vaccination
     public class UnitTests
     {
         [TestMethod]
-        public void BaseFunctionalityTest()
+        public void BaseFunctionalityTest() // Jakobs test 
         {
             // Arrange
             string[] input =
