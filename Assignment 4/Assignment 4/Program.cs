@@ -9,11 +9,6 @@ using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 
-/* 
- * hej :)
- * 
- * 
- */
 
 namespace Vaccination
 {
@@ -25,10 +20,12 @@ namespace Vaccination
         {
             get { return idNumber; }
             set
-            {               
+            {
                 // Remove any dashes or other non-digit characters
-                string idNr = value.Where(char.IsDigit).ToString();
 
+                //string idNr = value.Where(char.IsDigit).ToString();
+                string idNr = value.Replace("-", "").Replace("+", "").Trim();
+                
 
                 int year, month, day;
 
@@ -260,12 +257,6 @@ namespace Vaccination
 
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
-        //
-        // Parameters:
-        //
-        // input: the lines from a CSV file containing population information
-        // doses: the number of vaccine doses available
-        // vaccinateChildren: whether to vaccinate people younger than 18
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
             // this is the list the method will later return as a string[] 
@@ -336,30 +327,31 @@ namespace Vaccination
             // 4. Then by age in order (oldest to youngest).
             sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
 
-            List<string> output = new List<string>();
 
-            foreach (var person in sortedPeople)
+            // Return-list
+            var output = new List<string>();
+            foreach (Person person in sortedPeople)
+
             {
-                if (doses >= 2)
+                int administeredDose = 2; // default state is 2 doses 
+                if (person.HasHadInfection == 1) { administeredDose = 1; }
+
+
+                if (doses >= 2 || (doses == 1 && person.HasHadInfection == 1))
                 {
-
+                    string line =  $"{person.IDNumber},{person.LastName}," +
+                        $"{person.FirstName},{administeredDose}";
+                    output.Add(line);
+                    doses -= administeredDose;
                 }
-
+                else
+                {
+                    break; // break loop when doses run out 
+                }
             }
-            // fix return value :) 
-            // vvv this is kinda wrong vvv
-            // add return sortedPeople but join all the fields/properties into a complete
-            // string which is then added to a list of strings, then do return stringList.ToArray()
-
-            // Create a list of strings for each person
-            List<string> result = sortedPeople.Select(person =>
-            {
-                return $"{person.IDNumber}, {person.LastName}, {person.FirstName}, {person.WorksInHealthcare}, {person.IsInRiskGroup}, {person.HasHadInfection}";
-            }).ToList();
-
-            // Convert the list of strings to a string array and return it.
             
-                return result.ToArray();
+            return output.ToArray(); // return as array 
+
         }
 
         public static void PrioirtyOrderToCSV()
@@ -485,18 +477,7 @@ namespace Vaccination
     public class UnitTests
     {
         [TestMethod]
-        public void exTest()
-        {
-
-        }
-    }
-
-    // Jakobs tests vv
-    [TestClass]
-    public class BasicTests
-    {
-        [TestMethod]
-        public void BaseFunctionalityTest()
+        public void BaseFunctionalityTest() // Jakobs test 
         {
             // Arrange
             string[] input =
@@ -516,7 +497,5 @@ namespace Vaccination
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
     }
-    // Jakobs tests ^^^
 }
-
 
