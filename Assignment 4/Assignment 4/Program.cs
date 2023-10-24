@@ -278,6 +278,10 @@ namespace Vaccination
             // list where we will store the input from the CSV file
             List<Person> people = new List<Person>();
 
+            // set this to true if any line in the input CSV file (array in this case)
+            // is incorrectly formatted
+            bool anyLineIncorrect = false;
+
             // Read and parse the CSV data from the input array
             foreach (string line in input)
             {
@@ -294,6 +298,8 @@ namespace Vaccination
                     int isInRiskGroup = int.Parse(values[4]);
                     int hasHadInfection = int.Parse(values[5]);
 
+                    // try around the everything in this loop that uses person
+                    // to avoid person being used out of scope 
                     try
                     {
                         // Create a Person object
@@ -327,10 +333,17 @@ namespace Vaccination
 
                 if (values.Length != 6 || incorrectFormat)
                 {
-                    // add handling for incorrect amount of fields 
-                    // (or to an outputarray ?)
+                    Console.WriteLine("Inkorrekt format på en rad i input CSV-filen, ingen " +
+                        "output kommer att skrivas.");
+                    anyLineIncorrect = true;
                 }
             }
+
+            if (anyLineIncorrect)
+            {
+                return new string[0]; // returns an empty string-array 
+            }
+            // (else) if no incorrect lines are found continue below 
 
             // Sort the people based on the vaccination priority criteria
             // Priority order for vaccination:
@@ -378,7 +391,14 @@ namespace Vaccination
 
         public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
         {
-            if (File.Exists(filePath))
+            if (priorityOrder.Length == 0)
+            {
+                Console.WriteLine("Ingen prioritetsordning har skapats, ingen output skrivs " +
+                    "till utdatafilen.");
+                Console.WriteLine();
+                return;
+            }
+            else if (File.Exists(filePath))
             {
                 int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
                 {
