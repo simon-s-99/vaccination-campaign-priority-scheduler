@@ -22,7 +22,7 @@ namespace Vaccination
 {
     public class Person
     {
-        public DateTime DateOfBirth { get; private set; } 
+        public DateTime DateOfBirth { get; private set; }
         private string idNumber;
         public string IDNumber
         {
@@ -32,7 +32,7 @@ namespace Vaccination
 
                 // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
                 string idNr = value.Replace("-", "").Replace("+", "").Trim();
-                
+
 
                 int year, month, day;
 
@@ -56,14 +56,14 @@ namespace Vaccination
                 idNumber = idNr.Substring(0, 8) + "-" + idNr.Substring(8);
             }
         }
-        public string LastName { get; private set; } 
+        public string LastName { get; private set; }
         public string FirstName { get; private set; }
         public int WorksInHealthcare { get; private set; }
         public int IsInRiskGroup { get; private set; }
         public int HasHadInfection { get; private set; }
 
-        public Person(string idNr, string lastName, string firstName, 
-            int worksInHealthCare, int isInRiskGroup, int hasHadInfection) 
+        public Person(string idNr, string lastName, string firstName,
+            int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
         {
             IDNumber = idNr;
             LastName = lastName;
@@ -132,7 +132,7 @@ namespace Vaccination
                 {
                     Console.Clear();
 
-                    if (inputCSVFilepath != string.Empty && 
+                    if (inputCSVFilepath != string.Empty &&
                         outputCSVFilepath != string.Empty &&
                         doses >= 1)
                     {
@@ -142,7 +142,7 @@ namespace Vaccination
 
                         PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                     }
-                    
+
                     if (inputCSVFilepath == string.Empty)
                     {
                         Console.WriteLine("Välj indatafil först.");
@@ -168,7 +168,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages(); 
+                    doses = ChangeVaccineDosages();
                 }
                 else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
@@ -382,8 +382,6 @@ namespace Vaccination
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
                     Console.Clear();
-                    Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
-                    Console.WriteLine();
                     return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
@@ -402,6 +400,8 @@ namespace Vaccination
                 "Ja",
                 "Nej"
             });
+
+            Console.Clear();
 
             //Returns the new updated vaccination age. 
             if (ageMenu == 0)
@@ -433,6 +433,8 @@ namespace Vaccination
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
+                Console.Clear();
+
                 if (Path.IsPathFullyQualified(newPath))
                 {
                     // get file-extension if there is one
@@ -460,7 +462,6 @@ namespace Vaccination
                 }
 
                 // tell user to try again
-                Console.Clear();
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
                 Console.WriteLine();
@@ -615,7 +616,9 @@ namespace Vaccination
                 "201001021445,Blad,Hanna,0,1,1",
                 "20200330-1990,Malm,Lennie,0,0,1",
                 "20140101-1111,Svensson,Joel,0,0,0",
-                "9809041944,Sten,Kajsa,0,1,0"
+                "9809041944,Sten,Kajsa,0,1,0",
+                "20220204-1399,Palme,Olof,0,0,0", // 2 children born 2 days apart
+                "202202020754,Palme,Lisbeth,0,0,0" // this is in itself an interesting test 
             };
             int doses = 50;
             bool vaccinateChildren = true;
@@ -626,7 +629,9 @@ namespace Vaccination
                 "20111010-1111,Ekblom,Josy,2",
                 "19970420-1910,Olsson,Hans,2",
                 "20140101-1111,Svensson,Joel,2",
-                "20200330-1990,Malm,Lennie,1"
+                "20200330-1990,Malm,Lennie,1",
+                "20220202-0754,Palme,Lisbeth,2",
+                "20220204-1399,Palme,Olof,2",
             };
 
             string[] output = Program.CreateVaccinationOrder(input, doses, vaccinateChildren);
