@@ -616,7 +616,9 @@ namespace Vaccination
                 "201001021445,Blad,Hanna,0,1,1",
                 "20200330-1990,Malm,Lennie,0,0,1",
                 "20140101-1111,Svensson,Joel,0,0,0",
-                "9809041944,Sten,Kajsa,0,1,0"
+                "9809041944,Sten,Kajsa,0,1,0",
+                "20220204-1399,Palme,Olof,0,0,0", // 2 children born 2 days apart
+                "202202020754,Palme,Lisbeth,0,0,0" // this is in itself an interesting test 
             };
             int doses = 50;
             bool vaccinateChildren = true;
@@ -627,7 +629,9 @@ namespace Vaccination
                 "20111010-1111,Ekblom,Josy,2",
                 "19970420-1910,Olsson,Hans,2",
                 "20140101-1111,Svensson,Joel,2",
-                "20200330-1990,Malm,Lennie,1"
+                "20200330-1990,Malm,Lennie,1",
+                "20220202-0754,Palme,Lisbeth,2",
+                "20220204-1399,Palme,Olof,2",
             };
 
             string[] output = Program.CreateVaccinationOrder(input, doses, vaccinateChildren);
