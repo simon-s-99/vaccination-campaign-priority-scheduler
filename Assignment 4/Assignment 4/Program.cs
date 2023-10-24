@@ -353,7 +353,7 @@ namespace Vaccination
 
             // 2.people aged 65 and older
             sortedPeople.AddRange(people.Where(p =>
-                p.DateOfBirth.AddYears(65) <= DateTime.Now));
+                p.DateOfBirth.AddYears(65) <= DateTime.Now).OrderBy(p => p.DateOfBirth));
             people = people.Where(p => p.DateOfBirth.AddYears(65) > DateTime.Now).ToList();
 
             // 3. If the person is in a risk group.
