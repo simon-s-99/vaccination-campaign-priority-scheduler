@@ -9,15 +9,10 @@ using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 /*
- * Tjo!
  * 
  * Skriv 5 - 10 tester som testar en metod.
  * Dokumentation.
- * Omorganisera metoderna i rätt ordning.
  * 
- * 
- * 
- * Change rules for 0/1 , move them from constructor to set ? 
  * 
  */
 
@@ -132,7 +127,7 @@ namespace Vaccination
                 });
                 Console.Clear();
 
-                if (mainMenu == 0)
+                if (mainMenu == 0) // create priority order 
                 {
                     Console.Clear();
 
@@ -164,29 +159,29 @@ namespace Vaccination
 
                     Console.WriteLine();
                 }
-                else if (mainMenu == 1)
+                else if (mainMenu == 1) // schedule vaccinations 
                 {
                     // Schemalägg vaccinationer
                     // schemalägg är fr. VG-delen 
+                    // ej implementerad än 
                 }
-
-                else if (mainMenu == 2)
+                else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages();
+                    doses = ChangeVaccineDosages(); 
                 }
-                else if (mainMenu == 3)
+                else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
                     vaccinateChildren = ChangeAgeRequirement();
                 }
-                else if (mainMenu == 4)
+                else if (mainMenu == 4) // change input filepath
                 {
                     inputCSVFilepath = ChangeFilePath(isOutputPath: false);
                 }
-                else if (mainMenu == 5)
+                else if (mainMenu == 5) // change output filepath 
                 {
                     outputCSVFilepath = ChangeFilePath(isOutputPath: true);
                 }
-                else
+                else // exit program 
                 {
                     Console.Clear();
                     Console.WriteLine("Exiting program. Goodbye!");
@@ -195,6 +190,184 @@ namespace Vaccination
                 }
             } // <-- end of Main-loop 
         } // <-- end of Main() 
+
+        // Create the lines that should be saved to a CSV file after creating the vaccination order.
+        public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
+        {
+            // this is the list the method will later return as a string[] 
+            List<Person> sortedPeople = new List<Person>();
+
+            // list where we will store the input from the CSV file
+            List<Person> people = new List<Person>();
+
+            // set this to true if any line in the input CSV file (array in this case)
+            // is incorrectly formatted
+            bool anyLineIncorrect = false;
+
+            // Read and parse the CSV data from the input array
+            foreach (string line in input)
+            {
+                string[] values = line.Replace(" ", "").Split(',');
+
+                bool incorrectFormat = false;
+
+                if (values.Length == 6) // Make sure there are at least 6 values in the array.
+                {
+                    string idNumber = values[0];
+                    string lastName = values[1];
+                    string firstName = values[2];
+                    int worksInHealthcare = int.Parse(values[3]);
+                    int isInRiskGroup = int.Parse(values[4]);
+                    int hasHadInfection = int.Parse(values[5]);
+
+                    // try around the everything in this loop that uses person
+                    // to avoid person being used out of scope 
+                    try
+                    {
+                        // Create a Person object
+                        Person person = new Person(
+                            idNumber,
+                            lastName,
+                            firstName,
+                            worksInHealthcare,
+                            isInRiskGroup,
+                            hasHadInfection
+                        );
+
+                        // Store the person in the list
+                        if (vaccinateChildren)
+                        {
+                            people.Add(person);
+                        }
+                        else
+                        {
+                            if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
+                            {
+                                people.Add(person);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        incorrectFormat = true;
+                    }
+                }
+
+                if (values.Length != 6 || incorrectFormat)
+                {
+                    Console.WriteLine("Inkorrekt format på en rad i input CSV-filen, ingen " +
+                        "output kommer att skrivas.");
+                    anyLineIncorrect = true;
+                }
+            }
+
+            if (anyLineIncorrect)
+            {
+                return new string[0]; // returns an empty string-array 
+            }
+            // (else) if no incorrect lines are found continue below 
+
+            // Sort the people based on the vaccination priority criteria
+            // Priority order for vaccination:
+            // 1. If the person works in healthcare
+            sortedPeople.AddRange(people.Where(p => p.WorksInHealthcare == 1).
+                OrderBy(p => p.DateOfBirth));
+            people = people.Where(p => p.WorksInHealthcare == 0).ToList();
+
+            // 2.people aged 65 and older
+            sortedPeople.AddRange(people.Where(p =>
+                p.DateOfBirth.AddYears(65) <= DateTime.Now).OrderBy(p => p.DateOfBirth));
+            people = people.Where(p => p.DateOfBirth.AddYears(65) > DateTime.Now).ToList();
+
+            // 3. If the person is in a risk group.
+            sortedPeople.AddRange(people.Where(p => p.IsInRiskGroup == 1).
+                OrderBy(p => p.DateOfBirth));
+            people = people.Where(p => p.IsInRiskGroup == 0).ToList();
+
+            // 4. Then by age in order (oldest to youngest).
+            sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
+
+
+            // Return-list
+            var output = new List<string>();
+            foreach (Person person in sortedPeople)
+
+            {
+                int administeredDose = 2; // default state is 2 doses 
+                if (person.HasHadInfection == 1) { administeredDose = 1; }
+
+
+                if (doses >= 2 || (doses == 1 && person.HasHadInfection == 1))
+                {
+                    string line = $"{person.IDNumber},{person.LastName}," +
+                        $"{person.FirstName},{administeredDose}";
+                    output.Add(line);
+                    doses -= administeredDose;
+                }
+                else
+                {
+                    break; // break loop when doses run out 
+                }
+            }
+
+            return output.ToArray(); // return as array 
+        }
+
+        // outputs array to filepath, associated with CreateVaccinationOrder() in main menu-context 
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
+        {
+            if (priorityOrder.Length == 0)
+            {
+                Console.WriteLine("Ingen prioritetsordning har skapats, ingen output skrivs " +
+                    "till utdatafilen.");
+                Console.WriteLine();
+                return;
+            }
+            else if (File.Exists(filePath))
+            {
+                int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
+                {
+                    "Ja",
+                    "Nej"
+                });
+
+                Console.Clear();
+
+                if (overwriteMenu == 1)
+                {
+                    Console.WriteLine("Filen har inte sparats.");
+                    Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
+                    Console.WriteLine();
+                    return;
+                }
+            }
+
+            File.WriteAllLines(filePath, priorityOrder);
+            Console.WriteLine("Prioritetsordningen har sparats.");
+            Console.WriteLine();
+        }
+
+
+        // method for scheduling vaccinations, not implemented yet 
+        public static int ScheduleVaccinations()
+        {
+            /*The first vaccination should take place on a date selected by the user.
+             * Two people can be vaccinated at the same time.
+             * Every vaccination takes 5 minutes.
+             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
+             * The schedule should only contain the first dose for every person.
+             * The schedule should be saved in a .Ics file.
+             * 
+             * The user should be able to decide/change the follwing :
+             * Which date the vaccination should start (standard value: one week after current dateTime.Now
+             * Start time for vaccination (8:00 standard value.)
+             * End time for vaccination (20:00 standard value.)
+             * How many people that can be vaccinated at the same time (standard value :2)
+             * How long a vaccination should take (standard value: 5 minutes)
+             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
+             */
+            return 1;
+        }
 
         public static int ChangeVaccineDosages()
         {
@@ -207,7 +380,9 @@ namespace Vaccination
                 try
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
+                    Console.Clear();
                     Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
+                    Console.WriteLine();
                     return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
@@ -289,181 +464,6 @@ namespace Vaccination
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
                 Console.WriteLine();
             }
-        }
-
-        // Create the lines that should be saved to a CSV file after creating the vaccination order.
-        public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
-        {
-            // this is the list the method will later return as a string[] 
-            List<Person> sortedPeople = new List<Person>();
-
-            // list where we will store the input from the CSV file
-            List<Person> people = new List<Person>();
-
-            // set this to true if any line in the input CSV file (array in this case)
-            // is incorrectly formatted
-            bool anyLineIncorrect = false;
-
-            // Read and parse the CSV data from the input array
-            foreach (string line in input)
-            {
-                string[] values = line.Replace(" ", "").Split(',');
-
-                bool incorrectFormat = false;
-
-                if (values.Length == 6) // Make sure there are at least 6 values in the array.
-                {
-                    string idNumber = values[0];
-                    string lastName = values[1];
-                    string firstName = values[2];
-                    int worksInHealthcare = int.Parse(values[3]);
-                    int isInRiskGroup = int.Parse(values[4]);
-                    int hasHadInfection = int.Parse(values[5]);
-
-                    // try around the everything in this loop that uses person
-                    // to avoid person being used out of scope 
-                    try
-                    {
-                        // Create a Person object
-                        Person person = new Person(
-                            idNumber,
-                            lastName,
-                            firstName,
-                            worksInHealthcare,
-                            isInRiskGroup,
-                            hasHadInfection
-                        );
-
-                        // Store the person in the list
-                        if (vaccinateChildren)
-                        {
-                            people.Add(person);
-                        }
-                        else
-                        {
-                            if (person.DateOfBirth.AddYears(18) <= DateTime.Now)
-                            {
-                                people.Add(person);
-                            }
-                        }
-                    }
-                    catch 
-                    {
-                        incorrectFormat = true;
-                    }
-                }
-
-                if (values.Length != 6 || incorrectFormat)
-                {
-                    Console.WriteLine("Inkorrekt format på en rad i input CSV-filen, ingen " +
-                        "output kommer att skrivas.");
-                    anyLineIncorrect = true;
-                }
-            }
-
-            if (anyLineIncorrect)
-            {
-                return new string[0]; // returns an empty string-array 
-            }
-            // (else) if no incorrect lines are found continue below 
-
-            // Sort the people based on the vaccination priority criteria
-            // Priority order for vaccination:
-            // 1. If the person works in healthcare
-            sortedPeople.AddRange(people.Where(p => p.WorksInHealthcare == 1).
-                OrderBy(p => p.DateOfBirth));
-            people = people.Where(p => p.WorksInHealthcare == 0).ToList();
-
-            // 2.people aged 65 and older
-            sortedPeople.AddRange(people.Where(p =>
-                p.DateOfBirth.AddYears(65) <= DateTime.Now).OrderBy(p => p.DateOfBirth));
-            people = people.Where(p => p.DateOfBirth.AddYears(65) > DateTime.Now).ToList();
-
-            // 3. If the person is in a risk group.
-            sortedPeople.AddRange(people.Where(p => p.IsInRiskGroup == 1).
-                OrderBy(p => p.DateOfBirth));
-            people = people.Where(p => p.IsInRiskGroup == 0).ToList();
-
-            // 4. Then by age in order (oldest to youngest).
-            sortedPeople.AddRange(people.OrderBy(p => p.DateOfBirth));
-
-
-            // Return-list
-            var output = new List<string>();
-            foreach (Person person in sortedPeople)
-
-            {
-                int administeredDose = 2; // default state is 2 doses 
-                if (person.HasHadInfection == 1) { administeredDose = 1; }
-
-
-                if (doses >= 2 || (doses == 1 && person.HasHadInfection == 1))
-                {
-                    string line = $"{person.IDNumber},{person.LastName}," +
-                        $"{person.FirstName},{administeredDose}";
-                    output.Add(line);
-                    doses -= administeredDose;
-                }
-                else
-                {
-                    break; // break loop when doses run out 
-                }
-            }
-
-            return output.ToArray(); // return as array 
-        }
-
-        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
-        {
-            if (priorityOrder.Length == 0)
-            {
-                Console.WriteLine("Ingen prioritetsordning har skapats, ingen output skrivs " +
-                    "till utdatafilen.");
-                Console.WriteLine();
-                return;
-            }
-            else if (File.Exists(filePath))
-            {
-                int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
-                {
-                    "Ja",
-                    "Nej"
-                });
-
-                Console.Clear();
-
-                if (overwriteMenu == 1) 
-                {
-                    Console.WriteLine("Filen har inte sparats.");
-                    Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
-                    Console.WriteLine();
-                    return;
-                }
-            }
-            
-            File.WriteAllLines(filePath, priorityOrder);
-            Console.WriteLine("Prioritetsordningen har sparats.");
-            Console.WriteLine();
-        }
-
-        public static int VaccinationSchedule()
-        {
-            /*The first vaccination should take place on a date selected by the user.
-             * Two people can be vaccinated at the same time.
-             * Every vaccination takes 5 minutes.
-             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
-             * The schedule should only contain the first dose for every person.
-             * The schedule should be saved in a .Ics file.
-             * 
-             * The user should be able to decide/change the follwing :
-             * Which date the vaccination should start (standard value: one week after current dateTime.Now
-             * Start time for vaccination (8:00 standard value.)
-             * End time for vaccination (20:00 standard value.)
-             * How many people that can be vaccinated at the same time (standard value :2)
-             * How long a vaccination should take (standard value: 5 minutes)
-             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
-             */
-            return 1;
         }
 
         public static int ShowMenu(string prompt, IEnumerable<string> options)
