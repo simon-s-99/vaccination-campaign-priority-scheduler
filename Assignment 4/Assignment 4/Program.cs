@@ -9,15 +9,11 @@ using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 /*
- * Tjo!
  * 
  * Skriv 5 - 10 tester som testar en metod.
  * Dokumentation.
  * Omorganisera metoderna i rätt ordning.
  * 
- * 
- * 
- * Change rules for 0/1 , move them from constructor to set ? 
  * 
  */
 
@@ -132,7 +128,7 @@ namespace Vaccination
                 });
                 Console.Clear();
 
-                if (mainMenu == 0)
+                if (mainMenu == 0) // create priority order 
                 {
                     Console.Clear();
 
@@ -164,29 +160,29 @@ namespace Vaccination
 
                     Console.WriteLine();
                 }
-                else if (mainMenu == 1)
+                else if (mainMenu == 1) // schedule vaccinations 
                 {
                     // Schemalägg vaccinationer
                     // schemalägg är fr. VG-delen 
+                    // ej implementerad än 
                 }
-
-                else if (mainMenu == 2)
+                else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages();
+                    doses = ChangeVaccineDosages(); 
                 }
-                else if (mainMenu == 3)
+                else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
                     vaccinateChildren = ChangeAgeRequirement();
                 }
-                else if (mainMenu == 4)
+                else if (mainMenu == 4) // change input filepath
                 {
                     inputCSVFilepath = ChangeFilePath(isOutputPath: false);
                 }
-                else if (mainMenu == 5)
+                else if (mainMenu == 5) // change output filepath 
                 {
                     outputCSVFilepath = ChangeFilePath(isOutputPath: true);
                 }
-                else
+                else // exit program 
                 {
                     Console.Clear();
                     Console.WriteLine("Exiting program. Goodbye!");
@@ -207,7 +203,9 @@ namespace Vaccination
                 try
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
+                    Console.Clear();
                     Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
+                    Console.WriteLine();
                     return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
