@@ -22,7 +22,7 @@ namespace Vaccination
 {
     public class Person
     {
-        public DateTime DateOfBirth { get; private set; } 
+        public DateTime DateOfBirth { get; private set; }
         private string idNumber;
         public string IDNumber
         {
@@ -32,7 +32,7 @@ namespace Vaccination
 
                 // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
                 string idNr = value.Replace("-", "").Replace("+", "").Trim();
-                
+
 
                 int year, month, day;
 
@@ -56,14 +56,14 @@ namespace Vaccination
                 idNumber = idNr.Substring(0, 8) + "-" + idNr.Substring(8);
             }
         }
-        public string LastName { get; private set; } 
+        public string LastName { get; private set; }
         public string FirstName { get; private set; }
         public int WorksInHealthcare { get; private set; }
         public int IsInRiskGroup { get; private set; }
         public int HasHadInfection { get; private set; }
 
-        public Person(string idNr, string lastName, string firstName, 
-            int worksInHealthCare, int isInRiskGroup, int hasHadInfection) 
+        public Person(string idNr, string lastName, string firstName,
+            int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
         {
             IDNumber = idNr;
             LastName = lastName;
@@ -132,7 +132,7 @@ namespace Vaccination
                 {
                     Console.Clear();
 
-                    if (inputCSVFilepath != string.Empty && 
+                    if (inputCSVFilepath != string.Empty &&
                         outputCSVFilepath != string.Empty &&
                         doses >= 1)
                     {
@@ -142,7 +142,7 @@ namespace Vaccination
 
                         PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                     }
-                    
+
                     if (inputCSVFilepath == string.Empty)
                     {
                         Console.WriteLine("Välj indatafil först.");
@@ -168,7 +168,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages(); 
+                    doses = ChangeVaccineDosages();
                 }
                 else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
