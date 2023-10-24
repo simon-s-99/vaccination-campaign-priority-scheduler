@@ -382,8 +382,6 @@ namespace Vaccination
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
                     Console.Clear();
-                    Console.WriteLine($"Nytt antal vaccindoser: {newVaccineDosages}");
-                    Console.WriteLine();
                     return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
                 }
                 catch (FormatException)
@@ -402,6 +400,8 @@ namespace Vaccination
                 "Ja",
                 "Nej"
             });
+
+            Console.Clear();
 
             //Returns the new updated vaccination age. 
             if (ageMenu == 0)
@@ -433,6 +433,8 @@ namespace Vaccination
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
 
+                Console.Clear();
+
                 if (Path.IsPathFullyQualified(newPath))
                 {
                     // get file-extension if there is one
@@ -460,7 +462,6 @@ namespace Vaccination
                 }
 
                 // tell user to try again
-                Console.Clear();
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
                 Console.WriteLine();
