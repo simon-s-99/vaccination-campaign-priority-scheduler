@@ -543,9 +543,7 @@ namespace Vaccination
             Assert.AreEqual("19810203-2222,Efternamnsson,Eva,2", output[0]);
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
-    }
-    public class CreateVaccinationOrderTest
-    {
+
         [TestMethod]
         public void BasicPopulationTest()
         {
@@ -572,17 +570,18 @@ namespace Vaccination
             Assert.AreEqual("", output[0]);
             Assert.AreEqual("", output[1]);
         }
+
         [TestMethod]
         public void VaccinateChildrenTrue()
         {
             string[] input =
                 {
-                "9704201910,Olsson,Hans,0,0,0",              
+                "9704201910,Olsson,Hans,0,0,0",
                 "201110101111,Ekblom,Josy,0,1,0",
                 "201001021445,Blad,Hanna,0,1,1",
                 "20200330-1990,Malm,Lennie,0,0,1",
                 "20140101-111,Svensson,Joel,0,0,0"
-                
+
             };
             int doses = 50;
             bool vaccinateChildren = true;
@@ -597,6 +596,5 @@ namespace Vaccination
             Assert.AreEqual("", output[4]);
         }
     }
-   
 }
 
