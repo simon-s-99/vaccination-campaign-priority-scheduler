@@ -134,6 +134,8 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
+                    Console.Clear();
+
                     if (inputCSVFilepath != string.Empty && 
                         outputCSVFilepath != string.Empty &&
                         doses >= 1)
@@ -144,13 +146,23 @@ namespace Vaccination
 
                         PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                     }
-                    else
+                    
+                    if (inputCSVFilepath == string.Empty)
                     {
-                        Console.Clear();
-                        Console.WriteLine("Välj in-/utdatafil först.");
-                        Console.WriteLine("Antalet tillgängliga doser måste vara 1 eller mer.");
-                        Console.WriteLine();
+                        Console.WriteLine("Välj indatafil först.");
                     }
+
+                    if (outputCSVFilepath == string.Empty)
+                    {
+                        Console.WriteLine("Välj utdatafil först.");
+                    }
+
+                    if (doses < 1)
+                    {
+                        Console.WriteLine("Antalet tillgängliga doser måste vara 1 eller mer.");
+                    }
+
+                    Console.WriteLine();
                 }
                 else if (mainMenu == 1)
                 {
