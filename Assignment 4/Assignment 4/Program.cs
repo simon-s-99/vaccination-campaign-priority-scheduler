@@ -15,9 +15,9 @@ using System.Threading;
  * Dokumentation.
  * Omorganisera metoderna i rätt ordning.
  * 
- * Change rules for 0/1 , move them from constructor to set ? 
  * 
- * Fix wrong input format handling in CreateVaccinationOrder() 
+ * 
+ * Change rules for 0/1 , move them from constructor to set ? 
  * 
  */
 
@@ -110,8 +110,6 @@ namespace Vaccination
 
             while (true)
             {
-                Console.Clear();
-
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
                 Console.WriteLine($"Antal tillängliga vaccindoser {doses}");
@@ -125,7 +123,7 @@ namespace Vaccination
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
                     "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer", // <-- fr. VG-delen 
+                    "Schemalägg vaccinationer (ej implementerad)", // <-- fr. VG-delen 
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
@@ -136,11 +134,23 @@ namespace Vaccination
 
                 if (mainMenu == 0)
                 {
-                    string[] inputCSV = File.ReadAllLines(inputCSVFilepath);
+                    if (inputCSVFilepath != string.Empty && 
+                        outputCSVFilepath != string.Empty &&
+                        doses >= 1)
+                    {
+                        string[] inputCSV = File.ReadAllLines(inputCSVFilepath);
 
-                    string[] priorityOrder = CreateVaccinationOrder(inputCSV, doses, vaccinateChildren);
+                        string[] priorityOrder = CreateVaccinationOrder(inputCSV, doses, vaccinateChildren);
 
-                    PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
+                        PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Välj in-/utdatafil först.");
+                        Console.WriteLine("Antalet tillgängliga doser måste vara 1 eller mer.");
+                        Console.WriteLine();
+                    }
                 }
                 else if (mainMenu == 1)
                 {
