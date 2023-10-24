@@ -348,7 +348,8 @@ namespace Vaccination
             // Sort the people based on the vaccination priority criteria
             // Priority order for vaccination:
             // 1. If the person works in healthcare
-            sortedPeople.AddRange(people.Where(p => p.WorksInHealthcare == 1));
+            sortedPeople.AddRange(people.Where(p => p.WorksInHealthcare == 1).
+                OrderBy(p => p.DateOfBirth));
             people = people.Where(p => p.WorksInHealthcare == 0).ToList();
 
             // 2.people aged 65 and older
@@ -357,7 +358,8 @@ namespace Vaccination
             people = people.Where(p => p.DateOfBirth.AddYears(65) > DateTime.Now).ToList();
 
             // 3. If the person is in a risk group.
-            sortedPeople.AddRange(people.Where(p => p.IsInRiskGroup == 1));
+            sortedPeople.AddRange(people.Where(p => p.IsInRiskGroup == 1).
+                OrderBy(p => p.DateOfBirth));
             people = people.Where(p => p.IsInRiskGroup == 0).ToList();
 
             // 4. Then by age in order (oldest to youngest).
@@ -564,50 +566,48 @@ namespace Vaccination
             int doses = 100;
             bool vaccinateChildren = false;
 
+            string[] expected = {
+                "19860301-1212,Smittadsson,Kent,1", 
+                "19921112-1912,Ek,Pontus,2", 
+                "19340501-1234,Nilsson,Peter,2", 
+                "19400706-6666,Svensson,Jan,2", 
+                "19700225-1234,Bok,Ida,1", 
+                "19730606-1111,Eriksson,Petra,1", 
+                "19980904-1944,Sten,Kajsa,2", 
+                "19970420-1910,Olsson,Hans,2",
+            };
+
             string[] output = Program.CreateVaccinationOrder(input, doses, vaccinateChildren);
 
-            Assert.AreEqual(output.Length, 8);
-            Assert.AreEqual("19921112-1912,Ek,Pontus,2", output[0]);
-            Assert.AreEqual("19860301-1212,Smittadsson,Kent,1", output[1]);
-            Assert.AreEqual("19340501-1234,Nilsson,Peter,2", output[2]);
-            Assert.AreEqual("19400706-6666,Svensson,Jan,2", output[3]);
-            Assert.AreEqual("19730606-1111,Eriksson,Petra,1", output[4]);
-            Assert.AreEqual("19700225-1234,Bok,Ida,1", output[5]);
-            Assert.AreEqual("19980904-1944,Sten,Kajsa,2", output[6]);
-            Assert.AreEqual("19970420-1910,Olsson,Hans,2", output[9]);
-            
+            CollectionAssert.AreEqual(expected, output);
         }
 
         [TestMethod]
         public void VaccinateChildrenTrue()
         {
-            string[] input =
-                {
+            string[] input = {
                 "9704201910,Olsson,Hans,0,0,0",
                 "201110101111,Ekblom,Josy,0,1,0",
                 "201001021445,Blad,Hanna,0,1,1",
                 "20200330-1990,Malm,Lennie,0,0,1",
-                "20140101-111,Svensson,Joel,0,0,0",
+                "20140101-1111,Svensson,Joel,0,0,0",
                 "9809041944,Sten,Kajsa,0,1,0"
-
             };
             int doses = 50;
             bool vaccinateChildren = true;
 
-            string[] output = Program.CreateVaccinationOrder(input, doses, vaccinateChildren);
-
-            string[] expectedOutput = { 
-
+            string[] expected = { 
                 "19980904-1944,Sten,Kajsa,2",
                 "20100102-1445,Blad,Hanna,1",
                 "20111010-1111,Ekblom,Josy,2",
                 "19970420-1910,Olsson,Hans,2", 
-                "20140101-111,Svensson,Joel,2",
+                "20140101-1111,Svensson,Joel,2",
                 "20200330-1990,Malm,Lennie,1"
             };
 
-            CollectionAssert.AreEqual(expectedOutput, output);
-            
+            string[] output = Program.CreateVaccinationOrder(input, doses, vaccinateChildren);
+
+            CollectionAssert.AreEqual(expected, output);
         }
     }
 }
