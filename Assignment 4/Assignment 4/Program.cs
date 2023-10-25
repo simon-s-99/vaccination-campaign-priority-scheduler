@@ -218,16 +218,18 @@ namespace Vaccination
                 Console.WriteLine("Schemalägg vacinationer");
                 Console.WriteLine("--------------------");
                 Console.WriteLine("Mata in blankrad för att välja standardvärde.");
+
                 int scheduleMenu = ShowMenu("", new[]
                 {
                     $"Startdatum: {schedule.StartDate}", 
-                    $"Starttid: 12:00",
-                    $"Sluttid: 22:00",
-                    $"Antal samtidiga vaccinationer: ",
-                    $"Minuter per vaccination: 10",
-                    $"Kalenderfil: C:\\Users\\BradPitt\\Schedule.ics",
+                    $"Starttid: {schedule.StartTime}",
+                    $"Sluttid: {schedule.EndTime}",
+                    $"Antal samtidiga vaccinationer: {schedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {schedule.VaccinationTime}",
+                    $"Kalenderfil: {schedule.FilePathICS}",
                     "Gå tillbaka till huvudmeny"
                 });
+
                 Console.Clear();
 
                 if (scheduleMenu == 0)
