@@ -237,6 +237,7 @@ namespace Vaccination
                     Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
                     string input = Console.ReadLine();
                     var startDate = new DateTime();
+                    Console.Clear();
 
                     try
                     {
@@ -245,17 +246,40 @@ namespace Vaccination
                     catch
                     {
                         Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+                    }                   
+                }
+                else if (scheduleMenu == 1)
+                {
+                    Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
+                    string input = Console.ReadLine();
+                    TimeSpan startTime = new TimeSpan(8, 0, 0);
+                    Console.Clear();
+
+                    if (!string.IsNullOrEmpty(input))
+                    {
+                        try
+                        {
+                            DateTime time = DateTime.ParseExact(input, "HH:mm", null);
+                            startTime = time.TimeOfDay;
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter");
+                        }
                     }
+                }
+                else if (scheduleMenu == 2)
+                {
+
+                }
+                else if (scheduleMenu == 3)
+                {
+
                 }
                 else { return; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
 
-            else if (scheduleMenu == 1)
-            {
-
-            }
-
-            return 1; // <-- change this returnvalue 
+            //return 1; // <-- change this returnvalue 
 
         }
 
@@ -320,7 +344,6 @@ namespace Vaccination
                         incorrectFormat = true;
                     }
                 }
-
                 if (values.Length != 6 || incorrectFormat)
                 {
                     Console.WriteLine("Inkorrekt format på en rad i input CSV-filen, ingen " +
