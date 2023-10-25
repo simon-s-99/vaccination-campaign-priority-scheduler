@@ -84,28 +84,30 @@ namespace Vaccination
 
     public class Schedule
     {
+        private DateTime _StartDate { get; set; }
         public DateTime StartDate 
         { 
-            get { return StartDate; }
+            get { return _StartDate; }
             
             set
             {
                 // updates startdates hours/mins/seconds when the value is changed 
-                StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
-                StartDate.Add(StartTime);
+                _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
+                _StartDate.Add(StartTime);
             }
         }
+        private TimeSpan _StartTime { get; set; }
         public TimeSpan StartTime
         {
-            get { return StartTime; }
+            get { return _StartTime; }
 
             set
             {
-                StartTime = value;
+                _StartTime = value;
 
                 // update startdate with new hours/mins/seconds when starttime is changed 
-                StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
-                StartDate.Add(value);
+                _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
+                _StartDate.Add(value);
             }
         }
         public TimeSpan EndTime { get; set; }
@@ -196,7 +198,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    ScheduleVaccinations(schedule);
+                    schedule = ScheduleVaccinations(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -225,7 +227,7 @@ namespace Vaccination
         } // <-- end of Main() 
 
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static void ScheduleVaccinations(Schedule schedule)
+        public static Schedule ScheduleVaccinations(Schedule schedule)
         {
             /*The first vaccination should take place on a date selected by the user.
              * Two people can be vaccinated at the same time.
@@ -235,6 +237,8 @@ namespace Vaccination
              * The schedule should be saved in a .Ics file.
              */
 
+            var newSchedule = schedule;
+
             while (true)
             {
                 Console.WriteLine("Schemalägg vacinationer");
@@ -243,12 +247,12 @@ namespace Vaccination
 
                 int scheduleMenu = ShowMenu("", new[]
                 {
-                    $"Startdatum: {schedule.StartDate}", 
-                    $"Starttid: {schedule.StartTime}",
-                    $"Sluttid: {schedule.EndTime}",
-                    $"Antal samtidiga vaccinationer: {schedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {schedule.VaccinationTime}",
-                    $"Kalenderfil: {schedule.FilePathICS}",
+                    $"Startdatum: {newSchedule.StartDate}", 
+                    $"Starttid: {newSchedule.StartTime}",
+                    $"Sluttid: {newSchedule.EndTime}",
+                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {newSchedule.VaccinationTime}",
+                    $"Kalenderfil: {newSchedule.FilePathICS}",
                     "Gå tillbaka till huvudmeny"
                 });
 
@@ -269,7 +273,7 @@ namespace Vaccination
                         Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
                     }
                 }
-                else { return; } // exits this sub-menu and goes back to main-menu (main-loop) 
+                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
         }
 
