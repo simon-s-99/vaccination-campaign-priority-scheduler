@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Patient
 {
-    public class Patient
+    public class Person
     {
         public DateTime DateOfBirth { get; private set; }
         private string idNumber;
@@ -48,7 +48,7 @@ namespace Patient
         public int IsInRiskGroup { get; private set; }
         public int HasHadInfection { get; private set; }
 
-        public Patient(string idNr, string lastName, string firstName,
+        public Person(string idNr, string lastName, string firstName,
             int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
         {
             IDNumber = idNr;

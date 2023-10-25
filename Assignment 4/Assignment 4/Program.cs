@@ -116,10 +116,10 @@ namespace Vaccination
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
             // this is the list the method will later return as a string[] 
-            var sortedPeople = new List<Patient.Patient>();
+            var sortedPeople = new List<Patient.Person>();
 
             // list where we will store the input from the CSV file
-            var people = new List<Patient.Patient>();
+            var people = new List<Patient.Person>();
 
             // set this to true if any line in the input CSV file (array in this case)
             // is incorrectly formatted
@@ -146,7 +146,7 @@ namespace Vaccination
                     try
                     {
                         // Create a Person object
-                        var person = new Patient.Patient(
+                        var person = new Patient.Person(
                             idNumber,
                             lastName,
                             firstName,
@@ -210,7 +210,7 @@ namespace Vaccination
 
             // Return-list
             var output = new List<string>();
-            foreach (Patient.Patient person in sortedPeople)
+            foreach (Patient.Person person in sortedPeople)
 
             {
                 int administeredDose = 2; // default state is 2 doses 
