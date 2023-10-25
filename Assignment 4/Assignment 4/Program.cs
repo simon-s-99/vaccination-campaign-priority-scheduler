@@ -130,8 +130,8 @@ namespace Vaccination
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
-                    "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer (ej implementerad)", // <-- fr. VG-delen 
+                    "Skapa prioritetsordning",
+                    "Schemalägg vaccinationer",
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
