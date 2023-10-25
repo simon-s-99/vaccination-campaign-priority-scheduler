@@ -162,9 +162,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    // Schemalägg vaccinationer
-                    // schemalägg är fr. VG-delen 
-                    // ej implementerad än 
+                    ScheduleVaccinations();
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -191,6 +189,27 @@ namespace Vaccination
                 }
             } // <-- end of Main-loop 
         } // <-- end of Main() 
+
+        // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
+        public static int ScheduleVaccinations()
+        {
+            /*The first vaccination should take place on a date selected by the user.
+             * Two people can be vaccinated at the same time.
+             * Every vaccination takes 5 minutes.
+             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
+             * The schedule should only contain the first dose for every person.
+             * The schedule should be saved in a .Ics file.
+             * 
+             * The user should be able to decide/change the follwing :
+             * Which date the vaccination should start (standard value: one week after current dateTime.Now
+             * Start time for vaccination (8:00 standard value.)
+             * End time for vaccination (20:00 standard value.)
+             * How many people that can be vaccinated at the same time (standard value :2)
+             * How long a vaccination should take (standard value: 5 minutes)
+             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
+             */
+            return 1;
+        }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
@@ -346,28 +365,6 @@ namespace Vaccination
             File.WriteAllLines(filePath, priorityOrder);
             Console.WriteLine("Prioritetsordningen har sparats.");
             Console.WriteLine();
-        }
-
-
-        // method for scheduling vaccinations, not implemented yet 
-        public static int ScheduleVaccinations()
-        {
-            /*The first vaccination should take place on a date selected by the user.
-             * Two people can be vaccinated at the same time.
-             * Every vaccination takes 5 minutes.
-             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
-             * The schedule should only contain the first dose for every person.
-             * The schedule should be saved in a .Ics file.
-             * 
-             * The user should be able to decide/change the follwing :
-             * Which date the vaccination should start (standard value: one week after current dateTime.Now
-             * Start time for vaccination (8:00 standard value.)
-             * End time for vaccination (20:00 standard value.)
-             * How many people that can be vaccinated at the same time (standard value :2)
-             * How long a vaccination should take (standard value: 5 minutes)
-             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
-             */
-            return 1;
         }
 
         public static int ChangeVaccineDosages()
