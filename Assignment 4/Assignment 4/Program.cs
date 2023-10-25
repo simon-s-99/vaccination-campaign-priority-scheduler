@@ -91,7 +91,7 @@ namespace Vaccination
             
             set
             {
-                // updates startdates hours/mins/seconds when the value is changed 
+                // updates startdate hours/mins/seconds when the value is changed 
                 _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
                 _StartDate.Add(StartTime);
             }
@@ -264,13 +264,16 @@ namespace Vaccination
                     string input = Console.ReadLine();
                     var startDate = new DateTime();
 
-                    try
+                    if (!string.IsNullOrEmpty(input))
                     {
-                        startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+                        try
+                        {
+                            startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+                        }
                     }
                 }
                 else if (scheduleMenu == 1)
