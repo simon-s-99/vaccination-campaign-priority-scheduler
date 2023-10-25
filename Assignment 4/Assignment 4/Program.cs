@@ -12,120 +12,6 @@ using System.Threading;
 
 namespace Vaccination
 {
-    public class Person
-    {
-        public DateTime DateOfBirth { get; private set; }
-        private string idNumber;
-        public string IDNumber
-        {
-            get { return idNumber; }
-            set
-            {
-                // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
-                string idNr = value.Replace("-", "").Replace("+", "").Trim();
-
-                int year, month, day;
-
-                if (idNr.Length == 10)
-                {
-                    idNr = "19" + idNr;
-                }
-
-                if (idNr.Length == 12)
-                {
-                    year = int.Parse(idNr.Substring(0, 4));
-                    month = int.Parse(idNr.Substring(4, 2));
-                    day = int.Parse(idNr.Substring(6, 2));
-                }
-                else
-                {
-                    throw new ArgumentException("Identification number format is invalid.");
-                }
-
-                DateOfBirth = new DateTime(year, month, day);
-                idNumber = idNr.Substring(0, 8) + "-" + idNr.Substring(8);
-            }
-        }
-        public string LastName { get; private set; }
-        public string FirstName { get; private set; }
-        public int WorksInHealthcare { get; private set; }
-        public int IsInRiskGroup { get; private set; }
-        public int HasHadInfection { get; private set; }
-
-        public Person(string idNr, string lastName, string firstName,
-            int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
-        {
-            IDNumber = idNr;
-            LastName = lastName;
-            FirstName = firstName;
-
-            if (worksInHealthCare == 1) { WorksInHealthcare = worksInHealthCare; }
-            else if (worksInHealthCare == 0) { WorksInHealthcare = worksInHealthCare; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-
-            if (isInRiskGroup == 1) { IsInRiskGroup = isInRiskGroup; }
-            else if (isInRiskGroup == 0) { IsInRiskGroup = isInRiskGroup; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-
-            if (hasHadInfection == 1) { HasHadInfection = hasHadInfection; }
-            else if (hasHadInfection == 0) { HasHadInfection = hasHadInfection; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-        }
-    }
-
-    public class Schedule
-    {
-        private DateTime _StartDate { get; set; }
-        public DateTime StartDate 
-        { 
-            get { return _StartDate; }
-            
-            set
-            {
-                // updates startdate hours/mins/seconds when the value is changed 
-                _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
-                _StartDate.Add(StartTime);
-            }
-        }
-        private TimeSpan _StartTime { get; set; }
-        public TimeSpan StartTime
-        {
-            get { return _StartTime; }
-
-            set
-            {
-                _StartTime = value;
-
-                // update startdate with new hours/mins/seconds when starttime is changed 
-                _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
-                _StartDate.Add(value);
-            }
-        }
-        public TimeSpan EndTime { get; set; }
-        public TimeSpan VaccinationTime { get; set; }
-        public int ConcurrentVaccinations { get; set; }
-        public string FilePathICS { get; set; }
-
-        public Schedule()
-        {
-            StartDate = DateTime.Today.AddDays(7);
-            StartTime = new TimeSpan(8, 0, 0);
-            EndTime = new TimeSpan(20, 0, 0);
-            VaccinationTime = new TimeSpan(0, 5, 0);
-            ConcurrentVaccinations = 2;
-            FilePathICS = "C:\\Windows\\Temp\\Schedule.ics";
-        }
-    }
-
     public class Program
     {
         public static void Main()
@@ -138,7 +24,7 @@ namespace Vaccination
             string inputCSVFilepath = string.Empty;
             string outputCSVFilepath = string.Empty;
 
-            Schedule schedule = new Schedule(); // holds all scheduling info 
+            var schedule = new Schedule.Info(); // holds all scheduling info 
 
             while (true)
             {
@@ -198,7 +84,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    schedule = ScheduleVaccinations(schedule);
+                    schedule = Schedule.SubMenu.ScheduleVaccinations(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -226,73 +112,14 @@ namespace Vaccination
             } // <-- end of Main-loop 
         } // <-- end of Main() 
 
-        // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static Schedule ScheduleVaccinations(Schedule schedule)
-        {
-            /*The first vaccination should take place on a date selected by the user.
-             * Two people can be vaccinated at the same time.
-             * Every vaccination takes 5 minutes.
-             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
-             * The schedule should only contain the first dose for every person.
-             * The schedule should be saved in a .Ics file.
-             */
-
-            var newSchedule = schedule;
-
-            while (true)
-            {
-                Console.WriteLine("Schemalägg vacinationer");
-                Console.WriteLine("--------------------");
-                Console.WriteLine("Mata in blankrad för att välja standardvärde.");
-
-                int scheduleMenu = ShowMenu("", new[]
-                {
-                    $"Startdatum: {newSchedule.StartDate}", 
-                    $"Starttid: {newSchedule.StartTime}",
-                    $"Sluttid: {newSchedule.EndTime}",
-                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {newSchedule.VaccinationTime}",
-                    $"Kalenderfil: {newSchedule.FilePathICS}",
-                    "Gå tillbaka till huvudmeny"
-                });
-
-                Console.Clear();
-
-                if (scheduleMenu == 0)
-                {
-                    Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
-                    string input = Console.ReadLine();
-                    var startDate = new DateTime();
-
-                    if (!string.IsNullOrEmpty(input))
-                    {
-                        try
-                        {
-                            startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
-                        }
-                        catch
-                        {
-                            Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
-                        }
-                    }
-                }
-                else if (scheduleMenu == 1)
-                {
-
-                }
-                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
-            }
-
-        }
-
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
             // this is the list the method will later return as a string[] 
-            List<Person> sortedPeople = new List<Person>();
+            var sortedPeople = new List<Patient.Person>();
 
             // list where we will store the input from the CSV file
-            List<Person> people = new List<Person>();
+            var people = new List<Patient.Person>();
 
             // set this to true if any line in the input CSV file (array in this case)
             // is incorrectly formatted
@@ -319,7 +146,7 @@ namespace Vaccination
                     try
                     {
                         // Create a Person object
-                        Person person = new Person(
+                        var person = new Patient.Person(
                             idNumber,
                             lastName,
                             firstName,
@@ -346,7 +173,6 @@ namespace Vaccination
                         incorrectFormat = true;
                     }
                 }
-
                 if (values.Length != 6 || incorrectFormat)
                 {
                     Console.WriteLine("Inkorrekt format på en rad i input CSV-filen, ingen " +
@@ -384,7 +210,7 @@ namespace Vaccination
 
             // Return-list
             var output = new List<string>();
-            foreach (Person person in sortedPeople)
+            foreach (Patient.Person person in sortedPeople)
 
             {
                 int administeredDose = 2; // default state is 2 doses 
