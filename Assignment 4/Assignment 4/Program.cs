@@ -12,76 +12,6 @@ using System.Threading;
 
 namespace Vaccination
 {
-    public class Person
-    {
-        public DateTime DateOfBirth { get; private set; }
-        private string idNumber;
-        public string IDNumber
-        {
-            get { return idNumber; }
-            set
-            {
-                // Remove any dashes or plus-characters (apparantly valid id-numbers can have this) 
-                string idNr = value.Replace("-", "").Replace("+", "").Trim();
-
-                int year, month, day;
-
-                if (idNr.Length == 10)
-                {
-                    idNr = "19" + idNr;
-                }
-
-                if (idNr.Length == 12)
-                {
-                    year = int.Parse(idNr.Substring(0, 4));
-                    month = int.Parse(idNr.Substring(4, 2));
-                    day = int.Parse(idNr.Substring(6, 2));
-                }
-                else
-                {
-                    throw new ArgumentException("Identification number format is invalid.");
-                }
-
-                DateOfBirth = new DateTime(year, month, day);
-                idNumber = idNr.Substring(0, 8) + "-" + idNr.Substring(8);
-            }
-        }
-        public string LastName { get; private set; }
-        public string FirstName { get; private set; }
-        public int WorksInHealthcare { get; private set; }
-        public int IsInRiskGroup { get; private set; }
-        public int HasHadInfection { get; private set; }
-
-        public Person(string idNr, string lastName, string firstName,
-            int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
-        {
-            IDNumber = idNr;
-            LastName = lastName;
-            FirstName = firstName;
-
-            if (worksInHealthCare == 1) { WorksInHealthcare = worksInHealthCare; }
-            else if (worksInHealthCare == 0) { WorksInHealthcare = worksInHealthCare; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-
-            if (isInRiskGroup == 1) { IsInRiskGroup = isInRiskGroup; }
-            else if (isInRiskGroup == 0) { IsInRiskGroup = isInRiskGroup; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-
-            if (hasHadInfection == 1) { HasHadInfection = hasHadInfection; }
-            else if (hasHadInfection == 0) { HasHadInfection = hasHadInfection; }
-            else
-            {
-                throw new ArgumentException("Value is not in accepted range.");
-            }
-        }
-    }
-
     public class Schedule
     {
         private DateTime _StartDate { get; set; }
@@ -420,10 +350,10 @@ namespace Vaccination
         public static string[] CreateVaccinationOrder(string[] input, int doses, bool vaccinateChildren)
         {
             // this is the list the method will later return as a string[] 
-            List<Person> sortedPeople = new List<Person>();
+            var sortedPeople = new List<Patient.Person>();
 
             // list where we will store the input from the CSV file
-            List<Person> people = new List<Person>();
+            var people = new List<Patient.Person>();
 
             // set this to true if any line in the input CSV file (array in this case)
             // is incorrectly formatted
@@ -450,7 +380,7 @@ namespace Vaccination
                     try
                     {
                         // Create a Person object
-                        Person person = new Person(
+                        var person = new Patient.Person(
                             idNumber,
                             lastName,
                             firstName,
@@ -514,7 +444,7 @@ namespace Vaccination
 
             // Return-list
             var output = new List<string>();
-            foreach (Person person in sortedPeople)
+            foreach (Patient.Person person in sortedPeople)
 
             {
                 int administeredDose = 2; // default state is 2 doses 
