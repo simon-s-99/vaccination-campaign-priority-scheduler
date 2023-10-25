@@ -273,15 +273,12 @@ namespace Vaccination
                         Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
                     }
                 }
+                else if (scheduleMenu == 1)
+                {
+
+                }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
-
-            else if (scheduleMenu == 1)
-            {
-
-            }
-
-            return 1; // <-- change this returnvalue 
 
         }
 
