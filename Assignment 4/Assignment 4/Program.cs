@@ -84,8 +84,32 @@ namespace Vaccination
 
     public class Schedule
     {
-        public DateTime StartDate { get; set; }
-        public TimeSpan StartTime { get; set; }
+        private DateTime _StartDate { get; set; }
+        public DateTime StartDate 
+        { 
+            get { return _StartDate; }
+            
+            set
+            {
+                // updates startdates hours/mins/seconds when the value is changed 
+                _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
+                _StartDate.Add(StartTime);
+            }
+        }
+        private TimeSpan _StartTime { get; set; }
+        public TimeSpan StartTime
+        {
+            get { return _StartTime; }
+
+            set
+            {
+                _StartTime = value;
+
+                // update startdate with new hours/mins/seconds when starttime is changed 
+                _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
+                _StartDate.Add(value);
+            }
+        }
         public TimeSpan EndTime { get; set; }
         public TimeSpan VaccinationTime { get; set; }
         public int ConcurrentVaccinations { get; set; }
@@ -93,7 +117,7 @@ namespace Vaccination
 
         public Schedule()
         {
-            StartDate = DateTime.Now.AddDays(7);
+            StartDate = DateTime.Today.AddDays(7);
             StartTime = new TimeSpan(8, 0, 0);
             EndTime = new TimeSpan(20, 0, 0);
             VaccinationTime = new TimeSpan(0, 5, 0);
@@ -130,8 +154,8 @@ namespace Vaccination
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
-                    "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer (ej implementerad)", // <-- fr. VG-delen 
+                    "Skapa prioritetsordning",
+                    "Schemalägg vaccinationer",
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
@@ -174,7 +198,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    ScheduleVaccinations(schedule);
+                    schedule = ScheduleVaccinations(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -203,7 +227,7 @@ namespace Vaccination
         } // <-- end of Main() 
 
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static int ScheduleVaccinations(Schedule schedule)
+        public static Schedule ScheduleVaccinations(Schedule schedule)
         {
             /*The first vaccination should take place on a date selected by the user.
              * Two people can be vaccinated at the same time.
@@ -213,38 +237,49 @@ namespace Vaccination
              * The schedule should be saved in a .Ics file.
              */
 
+            var newSchedule = schedule;
 
-            Console.WriteLine("Schemalägg vacinationer");
-            Console.WriteLine("--------------------");
-            Console.WriteLine("Mata in blankrad för att välja standardvärde.");
-            int scheduleMenu = ShowMenu("", new[]
+            while (true)
             {
-                $"Startdatum: {schedule.StartDate}", 
-                $"Starttid: 12:00",
-                $"Sluttid: 22:00",
-                $"Antal samtidiga vaccinationer: ",
-                $"Minuter per vaccination: 10",
-                $"Kalenderfil: C:\\Users\\BradPitt\\Schedule.ics"
-            });
-            Console.Clear();
+                Console.WriteLine("Schemalägg vacinationer");
+                Console.WriteLine("--------------------");
+                Console.WriteLine("Mata in blankrad för att välja standardvärde.");
 
-            if (scheduleMenu == 0)
-            {
-                Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
-                string input = Console.ReadLine();
-                var startDate = new DateTime();
+                int scheduleMenu = ShowMenu("", new[]
+                {
+                    $"Startdatum: {newSchedule.StartDate}", 
+                    $"Starttid: {newSchedule.StartTime}",
+                    $"Sluttid: {newSchedule.EndTime}",
+                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {newSchedule.VaccinationTime}",
+                    $"Kalenderfil: {newSchedule.FilePathICS}",
+                    "Gå tillbaka till huvudmeny"
+                });
 
-                try
+                Console.Clear();
+
+                if (scheduleMenu == 0)
                 {
-                    startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                    Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
+                    string input = Console.ReadLine();
+                    var startDate = new DateTime();
+
+                    try
+                    {
+                        startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+                    }
                 }
-                catch
+                else if (scheduleMenu == 1)
                 {
-                    Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+
                 }
+                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
 
-            return 1; // <-- change this returnvalue 
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
