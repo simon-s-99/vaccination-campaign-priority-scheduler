@@ -84,8 +84,30 @@ namespace Vaccination
 
     public class Schedule
     {
-        public DateTime StartDate { get; set; }
-        public TimeSpan StartTime { get; set; }
+        public DateTime StartDate 
+        { 
+            get { return StartDate; }
+            
+            set
+            {
+                // updates startdates hours/mins/seconds when the value is changed 
+                StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
+                StartDate.Add(StartTime);
+            }
+        }
+        public TimeSpan StartTime
+        {
+            get { return StartTime; }
+
+            set
+            {
+                StartTime = value;
+
+                // update startdate with new hours/mins/seconds when starttime is changed 
+                StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
+                StartDate.Add(value);
+            }
+        }
         public TimeSpan EndTime { get; set; }
         public TimeSpan VaccinationTime { get; set; }
         public int ConcurrentVaccinations { get; set; }
@@ -93,7 +115,7 @@ namespace Vaccination
 
         public Schedule()
         {
-            StartDate = DateTime.Now.AddDays(7);
+            StartDate = DateTime.Today.AddDays(7);
             StartTime = new TimeSpan(8, 0, 0);
             EndTime = new TimeSpan(20, 0, 0);
             VaccinationTime = new TimeSpan(0, 5, 0);
