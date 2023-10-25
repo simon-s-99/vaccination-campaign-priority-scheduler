@@ -92,6 +92,20 @@ namespace Vaccination
         }
     }
 
+    public class Schedule
+    {
+        public DateTime StartDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public TimeSpan VaccinationTime { get; set; }
+        public int ConcurrentVaccinations { get; set; }
+
+        Schedule()
+        {
+            // empty constructor, add standard values here 
+        }
+    }
+
     public class Program
     {
         public static void Main()
