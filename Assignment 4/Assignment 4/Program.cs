@@ -9,14 +9,6 @@ using System.Linq;
 using System.Threading;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
-/*
- * 
- * Skriv 5 - 10 tester som testar en metod.
- * Dokumentation.
- * 
- * 
- */
-
 
 namespace Vaccination
 {
