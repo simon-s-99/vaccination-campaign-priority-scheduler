@@ -131,7 +131,7 @@ namespace Vaccination
                 {
                     Console.Clear();
 
-                    if (inputCSVFilepath != string.Empty && 
+                    if (inputCSVFilepath != string.Empty &&
                         outputCSVFilepath != string.Empty &&
                         doses >= 1)
                     {
@@ -141,7 +141,7 @@ namespace Vaccination
 
                         PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                     }
-                    
+
                     if (inputCSVFilepath == string.Empty)
                     {
                         Console.WriteLine("Välj indatafil först.");
@@ -161,13 +161,55 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    // Schemalägg vaccinationer
-                    // schemalägg är fr. VG-delen 
-                    // ej implementerad än 
+                    Console.WriteLine("Schemalägg vacinationer");
+                    Console.WriteLine("--------------------");
+                    Console.WriteLine("Mata in blankrad för att välja standardvärde.");
+                    int scheduleMenu = ShowMenu("", new[]
+                    {
+                        $"Startdatum (YYYY-MM-DD): 2022-11-01", //Change date/time values with the actual values.
+                        $"Starttid: 12:00",
+                        $"Sluttid: 22:00",
+                        $"Antal samtidiga vaccinationer: ",
+                        $"Minuter per vaccination: 10",
+                        $"Kalenderfil: C:\\Users\\BradPitt\\Schedule.ics"
+                    });
+                    Console.Clear();
+
+                    if (scheduleMenu == 0)
+                    {
+                        Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
+                        string input = Console.ReadLine();
+                        int year, month, day;
+
+                        if (input.Length == 10)
+                        {
+                            DateTime startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                            year = int.Parse(input.Substring(0, 4));
+                            month = int.Parse(input.Substring(4, 2));
+                            day = int.Parse(input.Substring(6, 2));
+                        }
+                        else if (input.Length == 8)
+                        {
+                            DateTime startDate = DateTime.ParseExact(input, "yyyyMMdd", null);
+                            year = int.Parse(input.Substring(0, 4));
+                            month = int.Parse(input.Substring(4, 2));
+                            day = int.Parse(input.Substring(6, 2));
+                        }
+                        else  //Error handling in case the user enters a invalid date
+                        {
+                            Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD");
+                        }                                                                     
+                      
+                        int StartDate = new DateTime(year, month, day);
+
+                        // Schemalägg vaccinationer
+                        // schemalägg är fr. VG-delen 
+                        // ej implementerad än 
+                    }
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages(); 
+                    doses = ChangeVaccineDosages();
                 }
                 else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
@@ -312,6 +354,25 @@ namespace Vaccination
 
             return output.ToArray(); // return as array 
         }
+        public static int ScheduleVaccinations()
+        {
+            /*The first vaccination should take place on a date selected by the user.
+             * Two people can be vaccinated at the same time.
+             * Every vaccination takes 5 minutes.
+             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
+             * The schedule should only contain the first dose for every person.
+             * The schedule should be saved in a .Ics file.
+             * 
+             * The user should be able to decide/change the follwing :
+             * Which date the vaccination should start (standard value: one week after current dateTime.Now
+             * Start time for vaccination (8:00 standard value.)
+             * End time for vaccination (20:00 standard value.)
+             * How many people that can be vaccinated at the same time (standard value :2)
+             * How long a vaccination should take (standard value: 5 minutes)
+             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
+             */
+            return 1;
+        }
 
         // outputs array to filepath, associated with CreateVaccinationOrder() in main menu-context 
         public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
@@ -349,25 +410,6 @@ namespace Vaccination
 
 
         // method for scheduling vaccinations, not implemented yet 
-        public static int ScheduleVaccinations()
-        {
-            /*The first vaccination should take place on a date selected by the user.
-             * Two people can be vaccinated at the same time.
-             * Every vaccination takes 5 minutes.
-             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
-             * The schedule should only contain the first dose for every person.
-             * The schedule should be saved in a .Ics file.
-             * 
-             * The user should be able to decide/change the follwing :
-             * Which date the vaccination should start (standard value: one week after current dateTime.Now
-             * Start time for vaccination (8:00 standard value.)
-             * End time for vaccination (20:00 standard value.)
-             * How many people that can be vaccinated at the same time (standard value :2)
-             * How long a vaccination should take (standard value: 5 minutes)
-             * Where the file should be saved (Standard value: C:\Windows\Temp\Schedule.ics)
-             */
-            return 1;
-        }
 
         public static int ChangeVaccineDosages()
         {
