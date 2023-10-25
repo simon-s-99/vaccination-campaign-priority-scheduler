@@ -260,44 +260,82 @@ namespace Vaccination
 
                 if (scheduleMenu == 0)
                 {
-                    Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
-                    string input = Console.ReadLine();
-                    var startDate = new DateTime();
-                    Console.Clear();
+                    while (true)
+                    {
+                        Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
+                        string input = Console.ReadLine();
+                        var startDate = new DateTime();
+                        Console.Clear();
 
-                    try
-                    {
-                        startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                        try
+                        {
+                            startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                            newSchedule.StartDate = startDate;
+                            break;
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
+                        }
+
                     }
-                    catch
-                    {
-                        Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag)");
-                    }                   
+                    
                 }
                 else if (scheduleMenu == 1)
                 {
+                    while (true)
+                    {
                     Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
                     string input = Console.ReadLine();
                     TimeSpan startTime = new TimeSpan(8, 0, 0);
                     Console.Clear();
 
-                    if (!string.IsNullOrEmpty(input))
-                    {
-                        try
+                        if (!string.IsNullOrEmpty(input))
                         {
-                            DateTime time = DateTime.ParseExact(input, "HH:mm", null);
-                            startTime = time.TimeOfDay;
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter");
+                            try
+                            {
+                                DateTime time = DateTime.ParseExact(input, "HH:mm", null);
+                                startTime = time.TimeOfDay;
+                                newSchedule.StartTime = startTime;
+                                break;
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter)");
+                            }
+                            
                         }
                     }
+
                 }
 
-                else if (scheduleMenu == 1)
+                else if (scheduleMenu == 2)
                 {
+                    while (true)
+                    {
+                        TimeSpan endTime = new TimeSpan(20, 0, 0);
 
+                        Console.WriteLine("Ange ny sluttid. t.ex.: 20:00");
+                        string input = Console.ReadLine();
+
+                        Console.Clear();
+
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            try
+                            {
+                                DateTime time = DateTime.ParseExact(input, "HH:mm", null);
+                                endTime = time.TimeOfDay;
+                                newSchedule.EndTime = endTime;
+                                break;
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter");
+                            }
+                            
+                        }
+                    }
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
