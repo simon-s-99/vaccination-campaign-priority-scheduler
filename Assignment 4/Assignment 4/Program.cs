@@ -84,8 +84,32 @@ namespace Vaccination
 
     public class Schedule
     {
-        public DateTime StartDate { get; set; }
-        public TimeSpan StartTime { get; set; }
+        private DateTime _StartDate { get; set; }
+        public DateTime StartDate 
+        { 
+            get { return _StartDate; }
+            
+            set
+            {
+                // updates startdates hours/mins/seconds when the value is changed 
+                _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
+                _StartDate.Add(StartTime);
+            }
+        }
+        private TimeSpan _StartTime { get; set; }
+        public TimeSpan StartTime
+        {
+            get { return _StartTime; }
+
+            set
+            {
+                _StartTime = value;
+
+                // update startdate with new hours/mins/seconds when starttime is changed 
+                _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
+                _StartDate.Add(value);
+            }
+        }
         public TimeSpan EndTime { get; set; }
         public TimeSpan VaccinationTime { get; set; }
         public int ConcurrentVaccinations { get; set; }
@@ -93,7 +117,7 @@ namespace Vaccination
 
         public Schedule()
         {
-            StartDate = DateTime.Now.AddDays(7);
+            StartDate = DateTime.Today.AddDays(7);
             StartTime = new TimeSpan(8, 0, 0);
             EndTime = new TimeSpan(20, 0, 0);
             VaccinationTime = new TimeSpan(0, 5, 0);
@@ -130,8 +154,8 @@ namespace Vaccination
 
                 int mainMenu = ShowMenu("Vad vill du göra?", new[]
                 {
-                    "Skapa prioritetsordning ",
-                    "Schemalägg vaccinationer (ej implementerad)", // <-- fr. VG-delen 
+                    "Skapa prioritetsordning",
+                    "Schemalägg vaccinationer",
                     "Ändra antal vaccindoser",
                     "Ändra åldersgräns",
                     "Ändra indatafil",
@@ -174,7 +198,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    ScheduleVaccinations(schedule);
+                    schedule = ScheduleVaccinations(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -203,7 +227,7 @@ namespace Vaccination
         } // <-- end of Main() 
 
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static void ScheduleVaccinations(Schedule schedule)
+        public static Schedule ScheduleVaccinations(Schedule schedule)
         {
             /*The first vaccination should take place on a date selected by the user.
              * Two people can be vaccinated at the same time.
@@ -213,6 +237,8 @@ namespace Vaccination
              * The schedule should be saved in a .Ics file.
              */
 
+            var newSchedule = schedule;
+
             while (true)
             {
                 Console.WriteLine("Schemalägg vacinationer");
@@ -221,12 +247,12 @@ namespace Vaccination
 
                 int scheduleMenu = ShowMenu("", new[]
                 {
-                    $"Startdatum: {schedule.StartDate}", 
-                    $"Starttid: {schedule.StartTime}",
-                    $"Sluttid: {schedule.EndTime}",
-                    $"Antal samtidiga vaccinationer: {schedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {schedule.VaccinationTime}",
-                    $"Kalenderfil: {schedule.FilePathICS}",
+                    $"Startdatum: {newSchedule.StartDate}", 
+                    $"Starttid: {newSchedule.StartTime}",
+                    $"Sluttid: {newSchedule.EndTime}",
+                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {newSchedule.VaccinationTime}",
+                    $"Kalenderfil: {newSchedule.FilePathICS}",
                     "Gå tillbaka till huvudmeny"
                 });
 
@@ -268,18 +294,14 @@ namespace Vaccination
                         }
                     }
                 }
-                else if (scheduleMenu == 2)
+
+                else if (scheduleMenu == 1)
                 {
 
                 }
-                else if (scheduleMenu == 3)
-                {
-
-                }
-                else { return; } // exits this sub-menu and goes back to main-menu (main-loop) 
+                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
 
-            //return 1; // <-- change this returnvalue 
 
         }
 
