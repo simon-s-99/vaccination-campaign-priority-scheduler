@@ -275,6 +275,14 @@ namespace Vaccination
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
+
+            else if (scheduleMenu == 1)
+            {
+
+            }
+
+            return 1; // <-- change this returnvalue 
+
         }
 
         // Create the lines that should be saved to a CSV file after creating the vaccination order.
