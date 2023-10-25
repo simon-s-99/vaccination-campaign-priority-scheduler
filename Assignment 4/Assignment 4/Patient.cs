@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace testing
+// Samuel Lööf & Simon Sörqvist, uppgift 4
+
+namespace Patient
 {
-    public class Person
+    public class Patient
     {
         public DateTime DateOfBirth { get; private set; }
         private string idNumber;
@@ -46,7 +48,7 @@ namespace testing
         public int IsInRiskGroup { get; private set; }
         public int HasHadInfection { get; private set; }
 
-        public Person(string idNr, string lastName, string firstName,
+        public Patient(string idNr, string lastName, string firstName,
             int worksInHealthCare, int isInRiskGroup, int hasHadInfection)
         {
             IDNumber = idNr;
