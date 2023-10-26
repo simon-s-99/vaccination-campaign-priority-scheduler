@@ -84,7 +84,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    schedule = Schedule.SubMenu.ScheduleVaccinations(schedule);
+                    schedule = Schedule.SubMenu.ScheduleMenu(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {

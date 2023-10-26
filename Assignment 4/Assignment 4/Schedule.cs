@@ -57,7 +57,7 @@ namespace Schedule
     public class SubMenu
     {
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static Info ScheduleVaccinations(Info schedule)
+        public static Info ScheduleMenu(Info schedule)
         {
             /*The first vaccination should take place on a date selected by the user.
              * Two people can be vaccinated at the same time.
