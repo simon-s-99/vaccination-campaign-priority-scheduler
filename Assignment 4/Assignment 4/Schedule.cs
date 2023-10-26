@@ -156,7 +156,7 @@ namespace Schedule
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
         public static string[] PriorityOrderToICS(string[] priorityOrder)
         {
-            var ouputICS = new List<string>(); // output list
+            var outputICS = new List<string>(); // output list
 
             /*
              * ics file output raw-text should look like this (contains 2 separate events):
@@ -164,6 +164,7 @@ namespace Schedule
                 BEGIN:VCALENDAR
                 VERSION:2.0
                 PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+
                 BEGIN:VEVENT
                 UID:20231101T080000Z@example.com
                 DTSTAMP:20231101T080000Z
@@ -171,6 +172,7 @@ namespace Schedule
                 DTEND:20231101T080500Z
                 SUMMARY:Namn,Namnsson,19950202-2244
                 END:VEVENT
+
                 BEGIN:VEVENT
                 UID:20231101T080500Z@example.com
                 DTSTAMP:20231101T080500Z
@@ -178,10 +180,24 @@ namespace Schedule
                 DTEND:20231101T081000Z
                 SUMMARY:Namn,Namnsson,19900101-1122
                 END:VEVENT
+
                 END:VCALENDAR
              */
 
-            return new string[0]; // <-- change this later
+            outputICS.Add("BEGIN:VCALENDAR");
+            outputICS.Add("VERSION:2.0");
+            outputICS.Add("PRODID:-//hacksw/handcal//NONSGML v1.0//EN");
+
+            foreach (string vaccination in priorityOrder)
+            {
+                outputICS.Add("BEGIN:VEVENT");
+
+                // code and logic here :) 
+
+                outputICS.Add("END:VEVENT");
+            }
+
+            return outputICS.ToArray();
         }
 
         public static DateTime VaccinationStartDate()
