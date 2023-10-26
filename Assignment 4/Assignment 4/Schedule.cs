@@ -247,16 +247,6 @@ namespace Schedule
             }
         }
 
-        // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICS(string[] priorityOrder)
-        {
-            var ouputICS = new List<string>(); // output list
-
-            
-
-            return new string[0]; // <-- change this later
-        }
-
         public static string ChangeFilePathICS()
         {
 
@@ -313,6 +303,16 @@ namespace Schedule
 
 
             return string.Empty; // <-- change this later 
+        }
+
+        // takes vaccination priority order as input (string[]) and returns the lines for the ics file
+        public static string[] PriorityOrderToICS(string[] priorityOrder)
+        {
+            var ouputICS = new List<string>(); // output list
+
+            
+
+            return new string[0]; // <-- change this later
         }
     }
 }
