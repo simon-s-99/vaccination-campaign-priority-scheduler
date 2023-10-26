@@ -240,10 +240,9 @@ namespace Schedule
                 }
                 else if (scheduleMenu == 5)
                 {
-                    while (true)
-                    {
-                        Console.WriteLine("Var vill du att .ics filen ska sparas?");
-                    }
+                    Console.WriteLine("Var vill du att .ics filen ska sparas?");
+
+                    newSchedule.FilePathICS = ChangeFilePathICS();
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
@@ -253,7 +252,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.ics)");
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
@@ -266,34 +265,21 @@ namespace Schedule
                     string fileName = Path.GetFileName(newPath);
                     string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
-                    if (isOutputPath) // output handling
+                    string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                    if (Directory.Exists(tempPath))
                     {
-                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                        if (Directory.Exists(tempPath))
+                        if (fileExtension == "ics" || fileExtension == "ICS")
                         {
-                            if (fileExtension == "csv" || fileExtension == "CSV")
-                            {
-                                return newPath;
-                            }
-                        }
-                    }
-                    else // input handling
-                    {
-                        if (fileExtension == "csv" || fileExtension == "CSV")
-                        {
-                            if (File.Exists(newPath)) { return newPath; }
+                            return newPath;
                         }
                     }
                 }
 
                 // tell user to try again
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
-                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.ics/.ICS)");
                 Console.WriteLine();
             }
-
-
-            return string.Empty; // <-- change this later 
         }
 
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
