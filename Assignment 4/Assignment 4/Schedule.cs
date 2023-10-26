@@ -246,5 +246,12 @@ namespace Schedule
             }
         }
 
+        // takes vaccination priority order as input (string[]) and returns the lines for the ics file
+        public static string[] PriorityOrderToICS(string[] priorityOrder)
+        {
+
+
+            return new string[0]; // change this later
+        }
     }
 }
