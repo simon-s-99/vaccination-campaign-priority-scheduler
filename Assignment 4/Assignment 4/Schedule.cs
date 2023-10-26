@@ -252,8 +252,16 @@ namespace Schedule
         {
             var ouputICS = new List<string>(); // output list
 
+            
 
-            return new string[0]; // change this later
+            return new string[0]; // <-- change this later
+        }
+
+        public static string ChangeFilePathICS()
+        {
+
+
+            return string.Empty; // <-- change this later 
         }
     }
 }
