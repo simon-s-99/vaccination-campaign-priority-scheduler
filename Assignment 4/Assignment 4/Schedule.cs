@@ -14,8 +14,9 @@ namespace Schedule
 {
     public class Info
     {
-        private DateTime _StartDate { get; set; }
-        public DateTime StartDate
+        //private DateTime _StartDate { get; set; }
+        public DateTime StartDate { get; set; }
+        /*
         {
             get { return _StartDate; }
 
@@ -25,9 +26,10 @@ namespace Schedule
                 _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
                 _StartDate.Add(StartTime);
             }
-        }
-        private TimeSpan _StartTime { get; set; }
-        public TimeSpan StartTime
+        } */
+        //private TimeSpan _StartTime { get; set; }
+        public TimeSpan StartTime { get; set; }
+        /*
         {
             get { return _StartTime; }
 
@@ -39,7 +41,7 @@ namespace Schedule
                 _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
                 _StartDate.Add(value);
             }
-        }
+        } */
         public TimeSpan EndTime { get; set; }
         public TimeSpan VaccinationTime { get; set; }
         public int ConcurrentVaccinations { get; set; }
