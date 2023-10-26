@@ -84,7 +84,7 @@ namespace Schedule
                     $"Starttid: {newSchedule.StartTime}",
                     $"Sluttid: {newSchedule.EndTime}",
                     $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {newSchedule.VaccinationTime}",
+                    $"Minuter per vaccination: {newSchedule.VaccinationTime.TotalMinutes}",
                     $"Kalenderfil: {newSchedule.FilePathICS}",
                     "Gå tillbaka till huvudmeny"
                 });
