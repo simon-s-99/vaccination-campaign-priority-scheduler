@@ -154,7 +154,7 @@ namespace Schedule
         }
 
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICS(string[] priorityOrder)
+        public static string[] PriorityOrderToICS(string[] priorityOrder, Info scheduleInfo)
         {
             var outputICS = new List<string>(); // output list
 
@@ -170,7 +170,7 @@ namespace Schedule
                 DTSTAMP:20231101T080000Z
                 DTSTART:20231101T080000Z
                 DTEND:20231101T080500Z
-                SUMMARY:Namn,Namnsson,19950202-2244
+                SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1
                 END:VEVENT
 
                 BEGIN:VEVENT
@@ -178,24 +178,46 @@ namespace Schedule
                 DTSTAMP:20231101T080500Z
                 DTSTART:20231101T080500Z
                 DTEND:20231101T081000Z
-                SUMMARY:Namn,Namnsson,19900101-1122
+                SUMMARY:Namn,Namnsson,19900101-1122,Doser: 2
                 END:VEVENT
 
                 END:VCALENDAR
              */
 
+            // add "start-template" values to outputICS 
             outputICS.Add("BEGIN:VCALENDAR");
             outputICS.Add("VERSION:2.0");
             outputICS.Add("PRODID:-//hacksw/handcal//NONSGML v1.0//EN");
 
+            DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
+            DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
+
             foreach (string vaccination in priorityOrder)
             {
+                DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                if (tempDate < timeLimit)
+                {
+                    // [DO THE VACCINATION HERE]
+
+                    // add time so the next vaccination is scheduled correctly 
+                    currentDate.Add(scheduleInfo.VaccinationTime); 
+                }
+                else
+                {
+                    // dont do the vaccination 
+
+                    currentDate.AddDays(1);
+                    timeLimit.AddDays(1);
+                }
+
                 outputICS.Add("BEGIN:VEVENT");
 
-                // code and logic here :) 
+                
 
                 outputICS.Add("END:VEVENT");
             }
+
+            outputICS.Add("END:VCALENDAR"); // ends ics file-template 
 
             return outputICS.ToArray();
         }
