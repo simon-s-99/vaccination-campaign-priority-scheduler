@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -249,6 +250,7 @@ namespace Schedule
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
         public static string[] PriorityOrderToICS(string[] priorityOrder)
         {
+            var ouputICS = new List<string>(); // output list
 
 
             return new string[0]; // change this later
