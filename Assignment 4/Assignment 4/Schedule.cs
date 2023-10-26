@@ -57,15 +57,11 @@ namespace Schedule
     public class SubMenu
     {
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static Info ScheduleVaccinations(Info schedule)
+        public static Info ScheduleMenu(Info schedule)
         {
-            /*The first vaccination should take place on a date selected by the user.
-             * Two people can be vaccinated at the same time.
-             * Every vaccination takes 5 minutes.
-             * Vaccination should be done cotiniously in the same speed from 8:00 to 20:00, every day of the week.
-             * The schedule should only contain the first dose for every person.
-             * The schedule should be saved in a .Ics file.
-             */
+           
+             //The schedule should be saved in a .Ics file.
+             
 
             var newSchedule = schedule;
 
@@ -88,40 +84,9 @@ namespace Schedule
 
                 Console.Clear();
 
-                if (scheduleMenu == 0)
+                if (scheduleMenu == 0) //Change the start date for the vaccinations
                 {
-                    while (true)
-                    {
-                        Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
-                        string input = Console.ReadLine();
-                        var startDate = new DateTime();
-                        Console.Clear();
-
-                        try
-                        {
-                            startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
-                            newSchedule.StartDate = startDate;
-                            break;
-                        }
-                        catch
-                        {
-                            Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag).");
-                        }
-
-
-                        if (!string.IsNullOrEmpty(input))
-                        {
-                            try
-                            {
-                                startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
-                            }
-                            catch
-                            {
-                                Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag).");
-                            }
-
-                        }
-                    }
+                    newSchedule.StartDate = VaccinationStartDate();
                 }
                 else if (scheduleMenu == 1)
                 {
@@ -244,6 +209,42 @@ namespace Schedule
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
+        }
+        public static DateTime VaccinationStartDate()
+        {
+            while (true)
+            {
+                Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
+                string input = Console.ReadLine();
+                var startDate = new DateTime();
+                Console.Clear();
+
+                try
+                {
+                    startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);                  
+                    return startDate;
+                }
+                catch
+                {
+                    Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag).");
+                }
+
+
+                if (!string.IsNullOrEmpty(input))
+                {
+                    try
+                    {
+                        startDate = DateTime.ParseExact(input, "yyyy-MM-dd", null);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Felaktigt datumformat. Använd formatet: YYYY-MM-DD (år-månad-dag).");
+                    }
+
+                }
+                
+            }
+             
         }
 
     }
