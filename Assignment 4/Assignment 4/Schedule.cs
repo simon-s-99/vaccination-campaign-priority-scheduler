@@ -194,25 +194,27 @@ namespace Schedule
 
             foreach (string vaccination in priorityOrder)
             {
+                outputICS.Add("BEGIN:VEVENT");
+
+            NewDay: // <-- goto point
                 DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                 if (tempDate < timeLimit)
-                {
-                    // [DO THE VACCINATION HERE]
+                {/*
+                    outputICS.Add($"UID:{}@example.com");
+                    outputICS.Add($"DTSTAMP:{}");
+                    outputICS.Add($"DTSTART:{}");
+                    outputICS.Add($"DTEND:{}");
+                    outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1{}");*/
 
                     // add time so the next vaccination is scheduled correctly 
-                    currentDate.Add(scheduleInfo.VaccinationTime); 
+                    currentDate = tempDate; 
                 }
                 else
                 {
-                    // dont do the vaccination 
-
-                    currentDate.AddDays(1);
-                    timeLimit.AddDays(1);
+                    currentDate.AddDays(1).Add(scheduleInfo.VaccinationTime); // update currentdate and
+                    timeLimit.AddDays(1);                       // timeLimit when end of day is reached 
+                    goto NewDay;
                 }
-
-                outputICS.Add("BEGIN:VEVENT");
-
-                
 
                 outputICS.Add("END:VEVENT");
             }
