@@ -84,7 +84,7 @@ namespace Vaccination
                 }
                 else if (mainMenu == 1) // schedule vaccinations 
                 {
-                    schedule = Schedule.SubMenu.ScheduleVaccinations(schedule);
+                    schedule = Schedule.SubMenu.ScheduleMenu(schedule);
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
@@ -325,7 +325,7 @@ namespace Vaccination
                     Console.WriteLine("Ändra indatafil.");
                 }
 
-                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.CSV)");
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
