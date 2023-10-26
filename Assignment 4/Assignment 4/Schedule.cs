@@ -199,12 +199,15 @@ namespace Schedule
             NewDay: // <-- goto point
                 DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                 if (tempDate < timeLimit)
-                {/*
-                    outputICS.Add($"UID:{}@example.com");
-                    outputICS.Add($"DTSTAMP:{}");
-                    outputICS.Add($"DTSTART:{}");
-                    outputICS.Add($"DTEND:{}");
-                    outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1{}");*/
+                {
+                    string dateformatICS = currentDate.ToString("yyyyMMdd") +
+                        "T" + currentDate.ToString("HHmmss");
+
+                    outputICS.Add($"UID:{dateformatICS}@example.com");
+                    outputICS.Add($"DTSTAMP:{dateformatICS}");
+                    outputICS.Add($"DTSTART:{dateformatICS}");
+                    outputICS.Add($"DTEND:{dateformatICS}");
+                    outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
 
                     // add time so the next vaccination is scheduled correctly 
                     currentDate = tempDate; 
