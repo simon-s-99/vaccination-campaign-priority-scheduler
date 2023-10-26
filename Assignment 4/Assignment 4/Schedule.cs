@@ -287,7 +287,28 @@ namespace Schedule
         {
             var ouputICS = new List<string>(); // output list
 
-            
+            /*
+             * ics file output raw-text should look like this (contains 2 separate events):
+             * 
+                BEGIN:VCALENDAR
+                VERSION:2.0
+                PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+                BEGIN:VEVENT
+                UID:20231101T080000Z@example.com
+                DTSTAMP:20231101T080000Z
+                DTSTART:20231101T080000Z
+                DTEND:20231101T080500Z
+                SUMMARY:Namn,Namnsson,19950202-2244
+                END:VEVENT
+                BEGIN:VEVENT
+                UID:20231101T080500Z@example.com
+                DTSTAMP:20231101T080500Z
+                DTSTART:20231101T080500Z
+                DTEND:20231101T081000Z
+                SUMMARY:Namn,Namnsson,19900101-1122
+                END:VEVENT
+                END:VCALENDAR
+             */
 
             return new string[0]; // <-- change this later
         }
