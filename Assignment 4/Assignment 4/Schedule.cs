@@ -261,6 +261,57 @@ namespace Schedule
         {
 
 
+            //while (true)
+            //{
+            //    if (isOutputPath)
+            //    {
+            //        Console.WriteLine("Ändra utdatafil.");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Ändra indatafil.");
+            //    }
+
+            //    Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
+            //    Console.WriteLine("---------------");
+            //    Console.Write("Ny filsökväg: ");
+            //    string newPath = Console.ReadLine().Trim();
+
+            //    Console.Clear();
+
+            //    if (Path.IsPathFullyQualified(newPath))
+            //    {
+            //        // get file-extension if there is one
+            //        string fileName = Path.GetFileName(newPath);
+            //        string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
+
+            //        if (isOutputPath) // output handling
+            //        {
+            //            string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+            //            if (Directory.Exists(tempPath))
+            //            {
+            //                if (fileExtension == "csv" || fileExtension == "CSV")
+            //                {
+            //                    return newPath;
+            //                }
+            //            }
+            //        }
+            //        else // input handling
+            //        {
+            //            if (fileExtension == "csv" || fileExtension == "CSV")
+            //            {
+            //                if (File.Exists(newPath)) { return newPath; }
+            //            }
+            //        }
+            //    }
+
+            //    // tell user to try again
+            //    Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
+            //    Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
+            //    Console.WriteLine();
+            //}
+
+
             return string.Empty; // <-- change this later 
         }
     }
