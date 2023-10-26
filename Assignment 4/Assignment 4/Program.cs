@@ -325,7 +325,7 @@ namespace Vaccination
                     Console.WriteLine("Ändra indatafil.");
                 }
 
-                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.txt )");
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.CSV)");
                 Console.WriteLine("---------------");
                 Console.Write("Ny filsökväg: ");
                 string newPath = Console.ReadLine().Trim();
