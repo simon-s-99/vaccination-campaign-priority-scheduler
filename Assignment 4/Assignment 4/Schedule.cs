@@ -84,121 +84,26 @@ namespace Schedule
 
                 Console.Clear();
 
-                if (scheduleMenu == 0) //Change the start date for the vaccinations
+                if (scheduleMenu == 0) //Change the start date for vaccinations
                 {
                     newSchedule.StartDate = VaccinationStartDate();
                 }
-                else if (scheduleMenu == 1)
+                else if (scheduleMenu == 1) //Change the start time for vaccinations
                 {
-                    while (true)
-                    {
-                        TimeSpan startTime = new TimeSpan(8, 0, 0);
-                        Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
-                        string input = Console.ReadLine();
-
-                        Console.Clear();
-
-                        if (!string.IsNullOrEmpty(input))
-                        {
-                            try
-                            {
-                                DateTime time = DateTime.ParseExact(input, "HH:mm", null);
-                                startTime = time.TimeOfDay;
-                                newSchedule.StartTime = startTime;
-                                break;
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter)");
-                            }
-
-                        }
-                    }
-
+                    newSchedule.StartTime = VaccinationStartTime();
                 }
 
-                else if (scheduleMenu == 2)
+                else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
-                    while (true)
-                    {
-                        TimeSpan endTime = new TimeSpan(20, 0, 0);
-                        Console.WriteLine("Ange ny sluttid. t.ex.: 20:00");
-                        string input = Console.ReadLine();
-
-                        Console.Clear();
-
-                        if (!string.IsNullOrEmpty(input))
-                        {
-                            try
-                            {
-                                DateTime time = DateTime.ParseExact(input, "HH:mm", null);
-                                endTime = time.TimeOfDay;
-                                newSchedule.EndTime = endTime;
-                                break;
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
-                            }
-
-                        }
-                    }
+                    newSchedule.EndTime = VaccinationEndTime();
                 }
-                else if (scheduleMenu == 3)
+                else if (scheduleMenu == 3) //Change the number of people that's allowed to get vaccinated at the same time
                 {
-                    while (true)
-                    {
-                        Console.WriteLine("Hur många personer ska kunna vaccineras samtidigt?");
-
-                        try
-                        {
-                            int input = int.Parse(Console.ReadLine());
-                            newSchedule.ConcurrentVaccinations = input;
-                            Console.Clear();
-                            break;
-                        }
-                        catch (FormatException)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Felaktigt format. Vänligen ange ett heltal.");
-                            Console.WriteLine();
-                        }
-                    }
+                    newSchedule.ConcurrentVaccinations = ConcurrentVaccinations();
                 }
-                else if (scheduleMenu == 4)
+                else if (scheduleMenu == 4) //Change how many minutes each vaccination should take.
                 {
-                    while (true)
-                    {
-                        Console.WriteLine("Hur länge ska varje vaccination vara (i minuter)?");
-                        string input = Console.ReadLine();
-
-                        if (!string.IsNullOrEmpty(input))
-                        {
-                            try
-                            {
-                                int minutes = int.Parse(input);
-                                if (minutes >= 0)
-                                {
-                                    TimeSpan vaccinationTime = new TimeSpan(0, minutes, 0);
-                                    newSchedule.VaccinationTime = vaccinationTime;
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine(" Felaktigt tidsformat. Ange ett positivt heltal."); //Keep or not?
-                                    Console.WriteLine();
-                                }
-                            }
-                            catch (FormatException)
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Felaktigt tidsformat. Ange vaccinationtiden i minuter.");
-                                Console.WriteLine();
-                            }
-                        }
-                    }
-                    Console.Clear();
+                    newSchedule.VaccinationTime = VaccinatonDuration();
                 }
                 else if (scheduleMenu == 5)
                 {
@@ -246,6 +151,113 @@ namespace Schedule
             }
              
         }
+        public static TimeSpan VaccinationStartTime()
+        {
+            while (true)
+            {
+                TimeSpan startTime = new TimeSpan(8, 0, 0);
+                Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
+                string input = Console.ReadLine();
 
+                Console.Clear();
+
+                if (!string.IsNullOrEmpty(input))
+                {
+                    try
+                    {
+                        DateTime time = DateTime.ParseExact(input, "HH:mm", null);
+                        startTime = time.TimeOfDay;
+                        
+                        return startTime;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Felaktigt tidsformat. Använd formated: HH:mm (timmar:minuter)");
+                    }
+
+                }
+            }
+        }
+        public static TimeSpan VaccinationEndTime()
+        {
+            while (true)
+            {
+                TimeSpan endTime = new TimeSpan(20, 0, 0);
+                Console.WriteLine("Ange ny sluttid. t.ex.: 20:00");
+                string input = Console.ReadLine();
+
+                Console.Clear();
+
+                if (!string.IsNullOrEmpty(input))
+                {
+                    try
+                    {
+                        DateTime time = DateTime.ParseExact(input, "HH:mm", null);
+                        endTime = time.TimeOfDay;
+                        
+                        return endTime;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
+                    }
+
+                }
+            }
+        }
+        public static int ConcurrentVaccinations()
+        {
+            while (true)
+            {
+                Console.WriteLine("Hur många personer ska kunna vaccineras samtidigt?");
+
+                try
+                {
+                    int input = int.Parse(Console.ReadLine());                  
+                    Console.Clear();
+                    return input;
+                }
+                catch (FormatException)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Felaktigt format. Vänligen ange ett heltal.");
+                    Console.WriteLine();
+                }
+            }
+        }
+        public static TimeSpan VaccinatonDuration()
+        {
+            while (true)
+            {
+                Console.WriteLine("Hur länge ska varje vaccination vara (i minuter)?");
+                string input = Console.ReadLine();
+
+                if (!string.IsNullOrEmpty(input))
+                {
+                    try
+                    {
+                        int minutes = int.Parse(input);
+                        if (minutes >= 0)
+                        {
+                            TimeSpan vaccinationTime = new TimeSpan(0, minutes, 0);
+                            return vaccinationTime;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine(" Felaktigt tidsformat. Ange ett positivt heltal."); //Keep or not?
+                            Console.WriteLine();
+                        }
+                    }
+                    catch (FormatException)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Felaktigt tidsformat. Ange vaccinationtiden i minuter.");
+                        Console.WriteLine();
+                    }
+                }
+            }
+            
+        }
     }
 }
