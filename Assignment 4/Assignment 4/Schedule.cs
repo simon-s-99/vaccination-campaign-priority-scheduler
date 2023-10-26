@@ -105,7 +105,7 @@ namespace Schedule
                 {
                     newSchedule.VaccinationTime = VaccinatonDuration();
                 }
-                else if (scheduleMenu == 5)
+                else if (scheduleMenu == 5) //Choose where to save the calendar .ics file.
                 {
                     while (true)
                     {
@@ -210,17 +210,28 @@ namespace Schedule
             while (true)
             {
                 Console.WriteLine("Hur många personer ska kunna vaccineras samtidigt?");
+                string input = Console.ReadLine();
+                int inputAsNr = 0;
+                Console.Clear();
 
                 try
                 {
-                    int input = int.Parse(Console.ReadLine());                  
-                    Console.Clear();
-                    return input;
+                    inputAsNr = int.Parse(input);
                 }
                 catch (FormatException)
                 {
-                    Console.Clear();
                     Console.WriteLine("Felaktigt format. Vänligen ange ett heltal.");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                if (inputAsNr > 0) 
+                {
+                    return inputAsNr;
+                }
+                else
+                {
+                    Console.WriteLine("Felaktigt format. Vänligen ange ett positivt heltal.");
                     Console.WriteLine();
                 }
             }
@@ -245,7 +256,7 @@ namespace Schedule
                         else
                         {
                             Console.Clear();
-                            Console.WriteLine(" Felaktigt tidsformat. Ange ett positivt heltal."); //Keep or not?
+                            Console.WriteLine("Felaktigt tidsformat. Ange ett positivt heltal."); //Keep or not?
                             Console.WriteLine();
                         }
                     }
