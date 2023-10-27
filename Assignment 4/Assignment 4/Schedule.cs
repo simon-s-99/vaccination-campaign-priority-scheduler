@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vaccination;
+using static System.Net.Mime.MediaTypeNames;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 
@@ -98,10 +99,12 @@ namespace Schedule
                             Vaccination.Program.VaccinateChildren);
 
                         var icsRawText = new List<string>();
+                        var rand = new Random();
 
                         try
                         {
-                            icsRawText = PriorityOrderToICSRawText(priorityOrder, newSchedule).ToList();
+                            icsRawText = PriorityOrderToICSRawText(priorityOrder, 
+                                newSchedule, rand.Next).ToList();
                             File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
                             Console.WriteLine("Vaccinations-schema har skapats.");
                             Console.WriteLine();
@@ -165,8 +168,15 @@ namespace Schedule
             }
         }
 
+        public static int GetRandomInt()
+        {
+            return new Random().Next(1, 100000);
+        }
+
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo)
+        // Func<int> rand parameter is for testing purposes, when this method is called it should be a Random()
+        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo,
+            Func<int> rand)
         {
             // priorityOrder must be greater than 0, throws ArgumentException if not
             if (priorityOrder.Length > 0)
@@ -179,58 +189,41 @@ namespace Schedule
                     "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
                 };
 
-                /*
-                 * ics file output raw-text should look like this (contains 2 separate events):
-                 * 
-                    BEGIN:VCALENDAR
-                    VERSION:2.0
-                    PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-
-                    BEGIN:VEVENT
-                    UID:20231101T080000Z@example.com
-                    DTSTAMP:20231101T080000Z
-                    DTSTART:20231101T080000Z
-                    DTEND:20231101T080500Z
-                    SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1
-                    END:VEVENT
-
-                    BEGIN:VEVENT
-                    UID:20231101T080500Z@example.com
-                    DTSTAMP:20231101T080500Z
-                    DTSTART:20231101T080500Z
-                    DTEND:20231101T081000Z
-                    SUMMARY:Namn,Namnsson,19900101-1122,Doser: 2
-                    END:VEVENT
-
-                    END:VCALENDAR
-                 */
-
-                // initial values used to handle start/stop times for vaccination on day one 
+                // initial values used to handle start/stop times
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
 
-                foreach (string vaccination in priorityOrder)
+                int concurrentVaccinationsDone = 0;
+                for (int i = 0; i < priorityOrder.Length; i++)
                 {
-                    string[] vaccinationInfo = vaccination.Split(',');
+                    // updates currentDate after every set of vaccinations
+                    if (concurrentVaccinationsDone == scheduleInfo.ConcurrentVaccinations)
+                    {
+                        currentDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                        concurrentVaccinationsDone = 0;
+                    }
+
+                    string[] vaccinationInfo = priorityOrder[i].Split(',');
 
                     outputICS.Add("BEGIN:VEVENT");
 
-                NewDay: // <-- goto point, helps schedule EVERY element in priorityOrder
-                    DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    NewDay: // <--- goto point 
+                    var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                     if (tempDate < timeLimit)
                     {
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
-                        outputICS.Add($"UID:{rawTextTimeFormat}@example.com");
+                        string rawTextTimeFormatPlusVaccinationTime = 
+                            tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
+
+                        // same identifier (UID) is technically possible but HIGHLY unlikely
+                        outputICS.Add($"UID:{rawTextTimeFormat + rand()}@example.com");
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
-                        outputICS.Add($"DTEND:{rawTextTimeFormat}");
+                        outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
                         outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
                             $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
-
-                        // add time so the next vaccination is scheduled correctly 
-                        currentDate = tempDate; 
                     }
                     else
                     {
@@ -240,10 +233,11 @@ namespace Schedule
                             currentDate.Day, 0, 0, 0);
                         currentDate = currentDate.Add(scheduleInfo.StartTime);
                         timeLimit = timeLimit.AddDays(1);
-                        goto NewDay;
+                        goto NewDay; // <-- goto 
                     }
 
                     outputICS.Add("END:VEVENT");
+                    concurrentVaccinationsDone++; 
                 }
 
                 outputICS.Add("END:VCALENDAR"); // ends ics file-template 

@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Schedule;
+using System;
 
 namespace Test
 {
@@ -265,10 +268,203 @@ namespace Test
     [TestClass]
     public class PriorityOrderToICSRawText
     {
-        [TestMethod]
-        public void ExampleTest()
-        {
+        // this is used for testing PriorityOrderToICSRawText so we get a reliable/testable UID value 
+        private int FixedUIDAddon() { return 99; }
 
+        [TestMethod]
+        public void BaseFunctionalityTest()
+        {
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2023, 11, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(20, 0, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 5, 0);
+            schedule.ConcurrentVaccinations = 2;
+
+            string[] priorityOrder = 
+            {
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+            };
+
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, 
+                schedule, FixedUIDAddon);
+
+            string[] expected =
+            {
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            };
+
+            CollectionAssert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void AllVaccinationsConcurrent()
+        {
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2023, 11, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(20, 0, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 5, 0);
+            schedule.ConcurrentVaccinations = 50;
+
+            string[] priorityOrder =
+            {
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+            };
+
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
+                schedule, FixedUIDAddon);
+
+            string[] expected =
+            {
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            };
+
+            CollectionAssert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void OneVaccinationPerDay()
+        {
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2023, 11, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(8, 5, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 4, 0);
+            schedule.ConcurrentVaccinations = 1;
+
+            string[] priorityOrder =
+            {
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+            };
+
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
+                schedule, FixedUIDAddon);
+
+            string[] expected =
+            {
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                "BEGIN:VEVENT",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080400",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231102T08000099@example.com",
+                "DTSTAMP:20231102T080000",
+                "DTSTART:20231102T080000",
+                "DTEND:20231102T080400",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231103T08000099@example.com",
+                "DTSTAMP:20231103T080000",
+                "DTSTART:20231103T080000",
+                "DTEND:20231103T080400",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231104T08000099@example.com",
+                "DTSTAMP:20231104T080000",
+                "DTSTART:20231104T080000",
+                "DTEND:20231104T080400",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            };
+
+            CollectionAssert.AreEqual(expected, result);
         }
     }
 }
