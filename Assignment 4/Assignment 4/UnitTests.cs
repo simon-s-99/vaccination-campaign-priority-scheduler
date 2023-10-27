@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Schedule;
+using System;
 
 namespace Test
 {
@@ -263,12 +265,26 @@ namespace Test
     }
 
     [TestClass]
-    public class PriorityOrderToICSRawText
+    public class ScheduleTests
     {
         [TestMethod]
         public void ExampleTest()
         {
+            string[] priorityOrder = new string[] { "Name,Namesson,19950202-2244,1", "AnotherName,AnotherNamesson,19900101-1122,2" };
+            Schedule.Info scheduleInfo = new Schedule.Info
+            {
+                StartDate = new DateTime(2023, 11, 1),
+                StartTime = new TimeSpan(8, 0, 0),
+                EndTime = new TimeSpan(20, 0, 0),
+                VaccinationTime = new TimeSpan(0, 5, 0)
+            };
 
+            // Act
+            //string[] result = Schedule.PriorityOrderToICSRawText(priorityOrder, scheduleInfo);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Length > 0);
         }
     }
 }
