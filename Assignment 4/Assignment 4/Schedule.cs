@@ -196,10 +196,13 @@ namespace Schedule
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
+                        string rawTextTimeFormatPlusVaccinationTime = 
+                            tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
+
                         outputICS.Add($"UID:{rawTextTimeFormat}@example.com");
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
-                        outputICS.Add($"DTEND:{rawTextTimeFormat}");
+                        outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
                         outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
                             $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
 
