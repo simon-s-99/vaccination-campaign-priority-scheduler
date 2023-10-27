@@ -221,7 +221,8 @@ namespace Schedule
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
                         outputICS.Add($"DTEND:{rawTextTimeFormat}");
-                        outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+                        outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
+                            $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
 
                         // add time so the next vaccination is scheduled correctly 
                         currentDate = tempDate; 
