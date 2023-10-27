@@ -268,15 +268,12 @@ namespace Test
     [TestClass]
     public class PriorityOrderToICSRawText
     {
+        // this is used for testing PriorityOrderToICSRawText so we get a reliable/testable UID value 
+        private int FixedUIDAddon() { return 99; }
+
         [TestMethod]                        
         public void BaseFunctionalityTest()
         {
-            string[] priorityOrder = 
-            {
-                "19320101-1122,Svensson,Janne,2",
-                "19940202-2244,Berg,Ida,1",
-            };
-
             var schedule = new Schedule.Info();
             schedule.StartDate = new DateTime(2023, 11, 1);
             schedule.StartTime = new TimeSpan(8, 0, 0);
@@ -284,7 +281,14 @@ namespace Test
             schedule.VaccinationTime = new TimeSpan(0, 5, 0);
             schedule.ConcurrentVaccinations = 2;
 
-            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, schedule);
+            string[] priorityOrder = 
+            {
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
+            };
+
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, 
+                schedule, FixedUIDAddon);
 
             string[] expected =
             {
@@ -292,17 +296,17 @@ namespace Test
                 "VERSION:2.0",
                 "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
                 "BEGIN:VEVENT",
-                "UID:20231101T080000@example.com",
+                "UID:20231101T08000099@example.com",
                 "DTSTAMP:20231101T080000",
                 "DTSTART:20231101T080000",
                 "DTEND:20231101T080500",
                 "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
                 "END:VEVENT",
                 "BEGIN:VEVENT",
-                "UID:20231101T080500@example.com",
-                "DTSTAMP:20231101T080500",
-                "DTSTART:20231101T080500",
-                "DTEND:20231101T081000",
+                "UID:20231101T08000099@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
                 "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
                 "END:VEVENT",
                 "END:VCALENDAR"

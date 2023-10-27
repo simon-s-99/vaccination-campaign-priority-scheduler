@@ -193,7 +193,6 @@ namespace Schedule
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
 
-                // counter gets incremented by 1 if an element is succesfully added to the output-list
                 for (int i = 0; i < priorityOrder.Length; i++)
                 {
                     // add time if all concurrent vaccinations have been written to the list
