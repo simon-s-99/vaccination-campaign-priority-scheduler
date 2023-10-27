@@ -63,10 +63,6 @@ namespace Schedule
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
         public static Info ScheduleMenu(Info schedule)
         {
-           
-             //The schedule should be saved in a .Ics file.
-             
-
             var newSchedule = schedule;
 
             while (true)
@@ -83,6 +79,7 @@ namespace Schedule
                     $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
                     $"Minuter per vaccination: {newSchedule.VaccinationTime.TotalMinutes}",
                     $"Kalenderfil: {newSchedule.FilePathICS}",
+                    "Generera kalenderfil (.ics)",
                     "Gå tillbaka till huvudmeny"
                 });
 
@@ -96,12 +93,12 @@ namespace Schedule
                 {
                     newSchedule.StartTime = VaccinationStartTime();
                 }
-
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
                     newSchedule.EndTime = VaccinationEndTime();
                 }
-                else if (scheduleMenu == 3) //Change the number of people that's allowed to get vaccinated at the same time
+                //Change the number of people that's allowed to get vaccinated at the same time
+                else if (scheduleMenu == 3) 
                 {
                     newSchedule.ConcurrentVaccinations = ConcurrentVaccinations();
                 }
@@ -114,6 +111,36 @@ namespace Schedule
                     Console.WriteLine("Var vill du att .ics filen ska sparas?");
 
                     newSchedule.FilePathICS = ChangeFilePathICS();
+                }
+                else if (scheduleMenu == 6) // generate the .isc file 
+                {
+                    if (!string.IsNullOrEmpty(Vaccination.Program.inputCSVFilepath))
+                    {
+                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.inputCSVFilepath);
+                        string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
+                            inputCSV,
+                            Vaccination.Program.doses,
+                            Vaccination.Program.vaccinateChildren);
+
+                        var icsRawText = new List<string>();
+
+                        Console.Clear();
+                        try
+                        {
+                            icsRawText = PriorityOrderToICSRawText(priorityOrder, newSchedule).ToList();
+                            File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
+                        }
+                        catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
+                        {
+                            Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
+                            Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en indatafil.");
+                        Console.WriteLine();
+                    }
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
@@ -221,7 +248,8 @@ namespace Schedule
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
                         outputICS.Add($"DTEND:{rawTextTimeFormat}");
-                        outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+                        outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
+                            $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
 
                         // add time so the next vaccination is scheduled correctly 
                         currentDate = tempDate; 
