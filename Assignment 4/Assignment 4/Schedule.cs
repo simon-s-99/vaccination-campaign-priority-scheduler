@@ -189,17 +189,18 @@ namespace Schedule
                     "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
                 };
 
-                // initial values used to handle start/stop times for vaccination on day one 
+                // initial values used to handle start/stop times
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
 
+                int concurrentVaccinationsDone = 0;
                 for (int i = 0; i < priorityOrder.Length; i++)
                 {
-                    // add time if all concurrent vaccinations have been written to the list
-                    var tempDate = new DateTime();
-                    if ((i % scheduleInfo.ConcurrentVaccinations) == 0)
+                    // updates currentDate after every set of vaccinations
+                    if (concurrentVaccinationsDone == scheduleInfo.ConcurrentVaccinations)
                     {
-                        tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                        currentDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                        concurrentVaccinationsDone = 0;
                     }
 
                     string[] vaccinationInfo = priorityOrder[i].Split(',');
@@ -207,11 +208,12 @@ namespace Schedule
                     outputICS.Add("BEGIN:VEVENT");
 
                     NewDay: // <--- goto point 
-                    if (tempDate < timeLimit)
+                    if (currentDate < timeLimit)
                     {
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
+                        var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                         string rawTextTimeFormatPlusVaccinationTime = 
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
@@ -222,9 +224,6 @@ namespace Schedule
                         outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
                         outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
                             $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
-
-                        // update time so next set of vaccinations are scheduled correctly
-                        currentDate = tempDate;
                     }
                     else
                     {
@@ -238,6 +237,7 @@ namespace Schedule
                     }
 
                     outputICS.Add("END:VEVENT");
+                    concurrentVaccinationsDone++; 
                 }
 
                 outputICS.Add("END:VCALENDAR"); // ends ics file-template 
