@@ -136,12 +136,18 @@ namespace Schedule
                     string fileName = Path.GetFileName(newPath);
                     string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
-                    string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                    if (Directory.Exists(tempPath))
+                    // for comparison of the illegal characters in a filename \/:*?"<>|
+                    // IndexOfAny returns -1 if none of the chars are found in the string 
+                    string illegalCharacters = "\\/:*?\"<>|";
+                    if (fileName.IndexOfAny(illegalCharacters.ToCharArray()) == -1)
                     {
-                        if (fileExtension == "ics" || fileExtension == "ICS")
+                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                        if (Directory.Exists(tempPath))
                         {
-                            return newPath;
+                            if (fileExtension == "ics" || fileExtension == "ICS")
+                            {
+                                return newPath;
+                            }
                         }
                     }
                 }
@@ -149,39 +155,99 @@ namespace Schedule
                 // tell user to try again
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.ics/.ICS)");
+                Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
                 Console.WriteLine();
             }
         }
 
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICS(string[] priorityOrder)
+        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo)
         {
-            var ouputICS = new List<string>(); // output list
+            // priorityOrder must be greater than 0, throws ArgumentException if not
+            if (priorityOrder.Length > 0)
+            {
+                // output list with the first template values of a raw text ics-file 
+                var outputICS = new List<string>
+                {
+                    "BEGIN:VCALENDAR",
+                    "VERSION:2.0",
+                    "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                };
 
-            /*
-             * ics file output raw-text should look like this (contains 2 separate events):
-             * 
-                BEGIN:VCALENDAR
-                VERSION:2.0
-                PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-                BEGIN:VEVENT
-                UID:20231101T080000Z@example.com
-                DTSTAMP:20231101T080000Z
-                DTSTART:20231101T080000Z
-                DTEND:20231101T080500Z
-                SUMMARY:Namn,Namnsson,19950202-2244
-                END:VEVENT
-                BEGIN:VEVENT
-                UID:20231101T080500Z@example.com
-                DTSTAMP:20231101T080500Z
-                DTSTART:20231101T080500Z
-                DTEND:20231101T081000Z
-                SUMMARY:Namn,Namnsson,19900101-1122
-                END:VEVENT
-                END:VCALENDAR
-             */
+                /*
+                 * ics file output raw-text should look like this (contains 2 separate events):
+                 * 
+                    BEGIN:VCALENDAR
+                    VERSION:2.0
+                    PRODID:-//hacksw/handcal//NONSGML v1.0//EN
 
-            return new string[0]; // <-- change this later
+                    BEGIN:VEVENT
+                    UID:20231101T080000Z@example.com
+                    DTSTAMP:20231101T080000Z
+                    DTSTART:20231101T080000Z
+                    DTEND:20231101T080500Z
+                    SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1
+                    END:VEVENT
+
+                    BEGIN:VEVENT
+                    UID:20231101T080500Z@example.com
+                    DTSTAMP:20231101T080500Z
+                    DTSTART:20231101T080500Z
+                    DTEND:20231101T081000Z
+                    SUMMARY:Namn,Namnsson,19900101-1122,Doser: 2
+                    END:VEVENT
+
+                    END:VCALENDAR
+                 */
+
+                // initial values used to handle start/stop times for vaccination on day one 
+                DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
+                DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
+
+                foreach (string vaccination in priorityOrder)
+                {
+                    string[] vaccinationInfo = vaccination.Split(',');
+
+                    outputICS.Add("BEGIN:VEVENT");
+
+                NewDay: // <-- goto point, helps schedule EVERY element in priorityOrder
+                    DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    if (tempDate < timeLimit)
+                    {
+                        string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
+                            "T" + currentDate.ToString("HHmmss");
+
+                        outputICS.Add($"UID:{rawTextTimeFormat}@example.com");
+                        outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
+                        outputICS.Add($"DTSTART:{rawTextTimeFormat}");
+                        outputICS.Add($"DTEND:{rawTextTimeFormat}");
+                        outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+
+                        // add time so the next vaccination is scheduled correctly 
+                        currentDate = tempDate; 
+                    }
+                    else
+                    {
+                        // update currentdate and timeLimit when end of day is reached
+                        currentDate = currentDate.AddDays(1);
+                        currentDate = new DateTime(currentDate.Year, currentDate.Month,
+                            currentDate.Day, 0, 0, 0);
+                        currentDate = currentDate.Add(scheduleInfo.StartTime);
+                        timeLimit = timeLimit.AddDays(1);
+                        goto NewDay;
+                    }
+
+                    outputICS.Add("END:VEVENT");
+                }
+
+                outputICS.Add("END:VCALENDAR"); // ends ics file-template 
+
+                return outputICS.ToArray();
+            }
+            else
+            {
+                throw new ArgumentException("Parameter priorityOrder[] must be greater than 0.");
+            }
         }
 
         public static DateTime VaccinationStartDate()
