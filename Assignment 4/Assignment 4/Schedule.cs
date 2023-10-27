@@ -70,7 +70,7 @@ namespace Schedule
                 }
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
-                    newSchedule.EndTime = VaccinationEndTime();
+                    newSchedule.EndTime = VaccinationEndTime(newSchedule);
                 }
                 //Change the number of people that's allowed to get vaccinated at the same time
                 else if (scheduleMenu == 3)
@@ -166,11 +166,6 @@ namespace Schedule
                 Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
                 Console.WriteLine();
             }
-        }
-
-        public static int GetRandomInt()
-        {
-            return new Random().Next(1, 100000);
         }
 
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
@@ -300,7 +295,7 @@ namespace Schedule
             }
         }
 
-        public static TimeSpan VaccinationEndTime()
+        public static TimeSpan VaccinationEndTime(Schedule.Info schedule)
         {
             while (true)
             {
@@ -313,15 +308,26 @@ namespace Schedule
                     return new TimeSpan(20, 0, 0); // Set it to default value
                 }
 
+                var time = new TimeSpan();
                 try
                 {
-                    DateTime time = DateTime.ParseExact(input, "HH:mm", null);
-                    return time.TimeOfDay;
+                    time = TimeSpan.ParseExact(input, "HH:mm", null);
                 }
                 catch (FormatException)
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
+
+                if (time <= schedule.StartTime)
+                {
+                    Console.WriteLine("Sluttiden måste vara senare än starttiden.");
+                }
+                else
+                {
+                    return time;
+                }
+
+                Console.WriteLine();
             }
         }
 
