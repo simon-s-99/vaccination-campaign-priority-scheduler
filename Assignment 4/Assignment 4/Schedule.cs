@@ -163,75 +163,84 @@ namespace Schedule
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
         public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo)
         {
-            var outputICS = new List<string>(); // output list
-
-            /*
-             * ics file output raw-text should look like this (contains 2 separate events):
-             * 
-                BEGIN:VCALENDAR
-                VERSION:2.0
-                PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-
-                BEGIN:VEVENT
-                UID:20231101T080000Z@example.com
-                DTSTAMP:20231101T080000Z
-                DTSTART:20231101T080000Z
-                DTEND:20231101T080500Z
-                SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1
-                END:VEVENT
-
-                BEGIN:VEVENT
-                UID:20231101T080500Z@example.com
-                DTSTAMP:20231101T080500Z
-                DTSTART:20231101T080500Z
-                DTEND:20231101T081000Z
-                SUMMARY:Namn,Namnsson,19900101-1122,Doser: 2
-                END:VEVENT
-
-                END:VCALENDAR
-             */
-
-            // add "start-template" values to outputICS 
-            outputICS.Add("BEGIN:VCALENDAR");
-            outputICS.Add("VERSION:2.0");
-            outputICS.Add("PRODID:-//hacksw/handcal//NONSGML v1.0//EN");
-
-            DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
-            DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
-
-            foreach (string vaccination in priorityOrder)
+            // priorityOrder must be greater than 0, throws ArgumentException if not
+            if (priorityOrder.Length > 0)
             {
-                outputICS.Add("BEGIN:VEVENT");
-
-            NewDay: // <-- goto point
-                DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
-                if (tempDate < timeLimit)
+                // output list with the first template values of a raw text ics-file 
+                var outputICS = new List<string>
                 {
-                    string dateformatICS = currentDate.ToString("yyyyMMdd") +
-                        "T" + currentDate.ToString("HHmmss");
+                    "BEGIN:VCALENDAR",
+                    "VERSION:2.0",
+                    "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                };
 
-                    outputICS.Add($"UID:{dateformatICS}@example.com");
-                    outputICS.Add($"DTSTAMP:{dateformatICS}");
-                    outputICS.Add($"DTSTART:{dateformatICS}");
-                    outputICS.Add($"DTEND:{dateformatICS}");
-                    outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+                /*
+                 * ics file output raw-text should look like this (contains 2 separate events):
+                 * 
+                    BEGIN:VCALENDAR
+                    VERSION:2.0
+                    PRODID:-//hacksw/handcal//NONSGML v1.0//EN
 
-                    // add time so the next vaccination is scheduled correctly 
-                    currentDate = tempDate; 
-                }
-                else
+                    BEGIN:VEVENT
+                    UID:20231101T080000Z@example.com
+                    DTSTAMP:20231101T080000Z
+                    DTSTART:20231101T080000Z
+                    DTEND:20231101T080500Z
+                    SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1
+                    END:VEVENT
+
+                    BEGIN:VEVENT
+                    UID:20231101T080500Z@example.com
+                    DTSTAMP:20231101T080500Z
+                    DTSTART:20231101T080500Z
+                    DTEND:20231101T081000Z
+                    SUMMARY:Namn,Namnsson,19900101-1122,Doser: 2
+                    END:VEVENT
+
+                    END:VCALENDAR
+                 */
+
+                DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
+                DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
+
+                foreach (string vaccination in priorityOrder)
                 {
-                    currentDate.AddDays(1).Add(scheduleInfo.VaccinationTime); // update currentdate and
-                    timeLimit.AddDays(1);                       // timeLimit when end of day is reached 
-                    goto NewDay;
+                    outputICS.Add("BEGIN:VEVENT");
+
+                NewDay: // <-- goto point
+                    DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    if (tempDate < timeLimit)
+                    {
+                        string dateformatICS = currentDate.ToString("yyyyMMdd") +
+                            "T" + currentDate.ToString("HHmmss");
+
+                        outputICS.Add($"UID:{dateformatICS}@example.com");
+                        outputICS.Add($"DTSTAMP:{dateformatICS}");
+                        outputICS.Add($"DTSTART:{dateformatICS}");
+                        outputICS.Add($"DTEND:{dateformatICS}");
+                        outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+
+                        // add time so the next vaccination is scheduled correctly 
+                        currentDate = tempDate; 
+                    }
+                    else
+                    {
+                        currentDate.AddDays(1).Add(scheduleInfo.VaccinationTime); // update currentdate and
+                        timeLimit.AddDays(1);                       // timeLimit when end of day is reached 
+                        goto NewDay;
+                    }
+
+                    outputICS.Add("END:VEVENT");
                 }
 
-                outputICS.Add("END:VEVENT");
+                outputICS.Add("END:VCALENDAR"); // ends ics file-template 
+
+                return outputICS.ToArray();
             }
-
-            outputICS.Add("END:VCALENDAR"); // ends ics file-template 
-
-            return outputICS.ToArray();
+            else
+            {
+                throw new ArgumentException("Parameter priorityOrder[] must be greater than 0.");
+            }
         }
 
         public static DateTime VaccinationStartDate()
