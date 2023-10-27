@@ -136,12 +136,18 @@ namespace Schedule
                     string fileName = Path.GetFileName(newPath);
                     string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
-                    string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                    if (Directory.Exists(tempPath))
+                    // for comparison of the illegal characters in a filename \/:*?"<>|
+                    // IndexOfAny returns -1 if none of the chars are found in the string 
+                    string illegalCharacters = "\\/:*?\"<>|";
+                    if (fileName.IndexOfAny(illegalCharacters.ToCharArray()) == -1)
                     {
-                        if (fileExtension == "ics" || fileExtension == "ICS")
+                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                        if (Directory.Exists(tempPath))
                         {
-                            return newPath;
+                            if (fileExtension == "ics" || fileExtension == "ICS")
+                            {
+                                return newPath;
+                            }
                         }
                     }
                 }
@@ -149,6 +155,7 @@ namespace Schedule
                 // tell user to try again
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.ics/.ICS)");
+                Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
                 Console.WriteLine();
             }
         }

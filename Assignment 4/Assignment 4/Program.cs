@@ -338,22 +338,28 @@ namespace Vaccination
                     string fileName = Path.GetFileName(newPath);
                     string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
 
-                    if (isOutputPath) // output handling
+                    // for comparison of the illegal characters in a filename \/:*?"<>|
+                    // IndexOfAny returns -1 if none of the chars are found in the string 
+                    string illegalCharacters = "\\/:*?\"<>|";
+                    if (fileName.IndexOfAny(illegalCharacters.ToCharArray()) == -1)
                     {
-                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                        if (Directory.Exists(tempPath))
+                        if (isOutputPath) // output handling
+                        {
+                            string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                            if (Directory.Exists(tempPath))
+                            {
+                                if (fileExtension == "csv" || fileExtension == "CSV")
+                                {
+                                    return newPath;
+                                }
+                            }
+                        }
+                        else // input handling
                         {
                             if (fileExtension == "csv" || fileExtension == "CSV")
                             {
-                                return newPath;
+                                if (File.Exists(newPath)) { return newPath; }
                             }
-                        }
-                    }
-                    else // input handling
-                    {
-                        if (fileExtension == "csv" || fileExtension == "CSV")
-                        {
-                            if (File.Exists(newPath)) { return newPath; }
                         }
                     }
                 }
@@ -361,6 +367,7 @@ namespace Vaccination
                 // tell user to try again
                 Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
                 Console.WriteLine("Tänk på att välja rätt fil-ändelse (.csv/.CSV)");
+                Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
                 Console.WriteLine();
             }
         }
