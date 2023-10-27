@@ -14,34 +14,8 @@ namespace Schedule
 {
     public class Info
     {
-        //private DateTime _StartDate { get; set; }
         public DateTime StartDate { get; set; }
-        /*
-        {
-            get { return _StartDate; }
-
-            set
-            {
-                // updates startdate hours/mins/seconds when the value is changed 
-                _StartDate = new DateTime(value.Year, value.Month, value.Day, 0, 0, 0);
-                _StartDate.Add(StartTime);
-            }
-        } */
-        //private TimeSpan _StartTime { get; set; }
         public TimeSpan StartTime { get; set; }
-        /*
-        {
-            get { return _StartTime; }
-
-            set
-            {
-                _StartTime = value;
-
-                // update startdate with new hours/mins/seconds when starttime is changed 
-                _StartDate = new DateTime(StartDate.Year, StartDate.Month, StartDate.Day, 0, 0, 0);
-                _StartDate.Add(value);
-            }
-        } */
         public TimeSpan EndTime { get; set; }
         public TimeSpan VaccinationTime { get; set; }
         public int ConcurrentVaccinations { get; set; }
@@ -63,10 +37,6 @@ namespace Schedule
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
         public static Info ScheduleMenu(Info schedule)
         {
-           
-             //The schedule should be saved in a .Ics file.
-             
-
             var newSchedule = schedule;
 
             while (true)
@@ -83,6 +53,7 @@ namespace Schedule
                     $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
                     $"Minuter per vaccination: {newSchedule.VaccinationTime.TotalMinutes}",
                     $"Kalenderfil: {newSchedule.FilePathICS}",
+                    "Generera kalenderfil (.ics)",
                     "Gå tillbaka till huvudmeny"
                 });
 
@@ -96,12 +67,12 @@ namespace Schedule
                 {
                     newSchedule.StartTime = VaccinationStartTime();
                 }
-
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
                     newSchedule.EndTime = VaccinationEndTime();
                 }
-                else if (scheduleMenu == 3) //Change the number of people that's allowed to get vaccinated at the same time
+                //Change the number of people that's allowed to get vaccinated at the same time
+                else if (scheduleMenu == 3)
                 {
                     newSchedule.ConcurrentVaccinations = ConcurrentVaccinations();
                 }
@@ -114,6 +85,40 @@ namespace Schedule
                     Console.WriteLine("Var vill du att .ics filen ska sparas?");
 
                     newSchedule.FilePathICS = ChangeFilePathICS();
+                }
+                else if (scheduleMenu == 6) // generate the .ics file 
+                {
+                    if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses > 0)
+                    {
+                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
+                        string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
+                            inputCSV,
+                            Vaccination.Program.Doses,
+                            Vaccination.Program.VaccinateChildren);
+
+                        var icsRawText = new List<string>();
+
+                        try
+                        {
+                            icsRawText = PriorityOrderToICSRawText(priorityOrder, newSchedule).ToList();
+                            File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
+                            Console.WriteLine("Vaccinations-schema har skapats.");
+                            Console.WriteLine();
+                        }
+                        catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
+                        {
+                            Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
+                            Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                            Console.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
+                        Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
+                        Console.WriteLine();
+                    }
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
@@ -221,7 +226,8 @@ namespace Schedule
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
                         outputICS.Add($"DTEND:{rawTextTimeFormat}");
-                        outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
+                        outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
+                            $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
 
                         // add time so the next vaccination is scheduled correctly 
                         currentDate = tempDate; 
