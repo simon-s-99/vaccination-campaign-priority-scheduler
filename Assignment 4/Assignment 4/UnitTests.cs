@@ -266,37 +266,49 @@ namespace Test
     }
 
     [TestClass]
-    public class ScheduleTests
+    public class PriorityOrderToICSRawText
     {
         [TestMethod]                        
-        public void StandardValuesTest()
+        public void BaseFunctionalityTest()
         {
-            string[] priorityOrder = {"Ida,Berg,19940202-2244,1", "Janne,Svensson,19320101-1122,2"};
-            Schedule.Info scheduleInfo = new Schedule.Info
+            string[] priorityOrder = 
             {
-                StartDate = new DateTime(2023, 11, 1),
-                StartTime = new TimeSpan(8, 0, 0),
-                EndTime = new TimeSpan(20, 0, 0),
-                VaccinationTime = new TimeSpan(0, 5, 0)
+                "19320101-1122,Svensson,Janne,2",
+                "19940202-2244,Berg,Ida,1",
             };
 
-            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, scheduleInfo);
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2023, 11, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(20, 0, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 5, 0);
+            schedule.ConcurrentVaccinations = 2;
 
-            string[] expectedOutput =
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, schedule);
+
+            string[] expected =
             {
-               "BEGIN:VCALENDAR",
+                "BEGIN:VCALENDAR",
                 "VERSION:2.0",
                 "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
                 "BEGIN:VEVENT",
-                "UID:19970714T170000@example.com",
-                "DTSTAMP:19970714T170000",
-                "DTSTART:19970714T170000",
-                "DTEND:19970715T040000",
-                "SUMMARY:Namn,Namnsson,19900101-1234,Doser=2",
+                "UID:20231101T080000@example.com",
+                "DTSTAMP:20231101T080000",
+                "DTSTART:20231101T080000",
+                "DTEND:20231101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20231101T080500@example.com",
+                "DTSTAMP:20231101T080500",
+                "DTSTART:20231101T080500",
+                "DTEND:20231101T081000",
+                "SUMMARY:19940202-2244,Berg,Ida,Doser=1",
                 "END:VEVENT",
                 "END:VCALENDAR"
             };
-                CollectionAssert.AreEqual(expectedOutput, result);
+
+            CollectionAssert.AreEqual(expected, result);
         }
     }
 }
