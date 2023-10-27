@@ -66,7 +66,7 @@ namespace Schedule
                 }
                 else if (scheduleMenu == 1) //Change the start time for vaccinations
                 {
-                    newSchedule.StartTime = VaccinationStartTime();
+                    newSchedule.StartTime = VaccinationStartTime(newSchedule);
                 }
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
@@ -270,7 +270,7 @@ namespace Schedule
             }
         }
 
-        public static TimeSpan VaccinationStartTime()
+        public static TimeSpan VaccinationStartTime(Schedule.Info schedule)
         {
             while (true)
             {
@@ -283,15 +283,26 @@ namespace Schedule
                     return new TimeSpan(8, 0, 0); // Set it to default value
                 }
 
+                var time = new TimeSpan();
                 try
                 {
-                    DateTime time = DateTime.ParseExact(input, "HH:mm", null);
-                    return time.TimeOfDay;
+                    time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
                 catch (FormatException)
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
+
+                if (time >= schedule.EndTime)
+                {
+                    Console.WriteLine("Starttiden måste vara tidigare än sluttiden.");
+                }
+                else
+                {
+                    return time;
+                }
+
+                Console.WriteLine();
             }
         }
 
@@ -311,7 +322,7 @@ namespace Schedule
                 var time = new TimeSpan();
                 try
                 {
-                    time = TimeSpan.ParseExact(input, "HH:mm", null);
+                    time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
                 catch (FormatException)
                 {
