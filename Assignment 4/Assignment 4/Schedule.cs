@@ -208,12 +208,12 @@ namespace Schedule
                     outputICS.Add("BEGIN:VEVENT");
 
                     NewDay: // <--- goto point 
-                    if (currentDate < timeLimit)
+                    var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    if (tempDate < timeLimit)
                     {
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
-                        var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                         string rawTextTimeFormatPlusVaccinationTime = 
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
