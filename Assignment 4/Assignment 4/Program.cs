@@ -15,9 +15,9 @@ namespace Vaccination
     public class Program
     {
         // global/static so that these can be reached from PriorityOrderToICSRawText() in Schedule.cs 
-        public static int doses = 0;
-        public static bool vaccinateChildren = false;
-        public static string inputCSVFilepath = string.Empty;
+        public static int Doses = 0;
+        public static bool VaccinateChildren = false;
+        public static string InputCSVFilepath = string.Empty;
 
         public static void Main()
         {
@@ -30,11 +30,11 @@ namespace Vaccination
             {
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
-                Console.WriteLine($"Antal tillängliga vaccindoser {doses}");
+                Console.WriteLine($"Antal tillängliga vaccindoser {Doses}");
 
-                string ageRestriction = vaccinateChildren ? "ja" : "nej";
+                string ageRestriction = VaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
-                Console.WriteLine($"Indatafil: {inputCSVFilepath}");
+                Console.WriteLine($"Indatafil: {InputCSVFilepath}");
                 Console.WriteLine($"Utdatafil: {outputCSVFilepath}");
                 Console.WriteLine();
 
@@ -54,18 +54,18 @@ namespace Vaccination
                 {
                     Console.Clear();
 
-                    if (inputCSVFilepath != string.Empty &&
+                    if (InputCSVFilepath != string.Empty &&
                         outputCSVFilepath != string.Empty &&
-                        doses >= 1)
+                        Doses >= 1)
                     {
-                        string[] inputCSV = File.ReadAllLines(inputCSVFilepath);
+                        string[] inputCSV = File.ReadAllLines(InputCSVFilepath);
 
-                        string[] priorityOrder = CreateVaccinationOrder(inputCSV, doses, vaccinateChildren);
+                        string[] priorityOrder = CreateVaccinationOrder(inputCSV, Doses, VaccinateChildren);
 
                         PriorityOrderToCSV(priorityOrder, outputCSVFilepath);
                     }
 
-                    if (inputCSVFilepath == string.Empty)
+                    if (InputCSVFilepath == string.Empty)
                     {
                         Console.WriteLine("Välj indatafil först.");
                     }
@@ -75,7 +75,7 @@ namespace Vaccination
                         Console.WriteLine("Välj utdatafil först.");
                     }
 
-                    if (doses < 1)
+                    if (Doses < 1)
                     {
                         Console.WriteLine("Antalet tillgängliga doser måste vara 1 eller mer.");
                     }
@@ -88,15 +88,15 @@ namespace Vaccination
                 }
                 else if (mainMenu == 2) // change nr. of available doses 
                 {
-                    doses = ChangeVaccineDosages();
+                    Doses = ChangeVaccineDosages();
                 }
                 else if (mainMenu == 3) // change age / vaccinate children? yes/no 
                 {
-                    vaccinateChildren = ChangeAgeRequirement();
+                    VaccinateChildren = ChangeAgeRequirement();
                 }
                 else if (mainMenu == 4) // change input filepath
                 {
-                    inputCSVFilepath = ChangeFilePathCSV(isOutputPath: false);
+                    InputCSVFilepath = ChangeFilePathCSV(isOutputPath: false);
                 }
                 else if (mainMenu == 5) // change output filepath 
                 {

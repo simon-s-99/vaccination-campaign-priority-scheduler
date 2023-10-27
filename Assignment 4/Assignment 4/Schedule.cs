@@ -86,16 +86,16 @@ namespace Schedule
 
                     newSchedule.FilePathICS = ChangeFilePathICS();
                 }
-                else if (scheduleMenu == 6) // generate the .isc file 
+                else if (scheduleMenu == 6) // generate the .ics file 
                 {
-                    if (!string.IsNullOrEmpty(Vaccination.Program.inputCSVFilepath) ||
-                        Vaccination.Program.doses > 0)
+                    if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses > 0)
                     {
-                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.inputCSVFilepath);
+                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
                         string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
                             inputCSV,
-                            Vaccination.Program.doses,
-                            Vaccination.Program.vaccinateChildren);
+                            Vaccination.Program.Doses,
+                            Vaccination.Program.VaccinateChildren);
 
                         var icsRawText = new List<string>();
 
@@ -103,11 +103,14 @@ namespace Schedule
                         {
                             icsRawText = PriorityOrderToICSRawText(priorityOrder, newSchedule).ToList();
                             File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
+                            Console.WriteLine("Vaccinations-schema har skapats.");
+                            Console.WriteLine();
                         }
                         catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
                         {
                             Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
                             Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                            Console.WriteLine();
                         }
                     }
                     else
