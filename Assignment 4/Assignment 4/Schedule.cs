@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vaccination;
+using static System.Net.Mime.MediaTypeNames;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 
@@ -182,15 +183,23 @@ namespace Schedule
                 // initial values used to handle start/stop times for vaccination on day one 
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
+                var rand = new Random(); // for UID 
 
-                foreach (string vaccination in priorityOrder)
+                // counter gets incremented by 1 if an element is succesfully added to the output-list
+                for (int i = 0; i < priorityOrder.Length; i++)
                 {
-                    string[] vaccinationInfo = vaccination.Split(',');
+                    // add time if all concurrent vaccinations have been written to the list
+                    var tempDate = new DateTime();
+                    if ((i % scheduleInfo.ConcurrentVaccinations) == 0)
+                    {
+                        tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    }
+
+                    string[] vaccinationInfo = priorityOrder[i].Split(',');
 
                     outputICS.Add("BEGIN:VEVENT");
 
-                NewDay: // <-- goto point, helps schedule EVERY element in priorityOrder
-                    DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    NewDay: // <--- goto point 
                     if (tempDate < timeLimit)
                     {
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
@@ -199,15 +208,16 @@ namespace Schedule
                         string rawTextTimeFormatPlusVaccinationTime = 
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
-                        outputICS.Add($"UID:{rawTextTimeFormat}@example.com");
+                        // same identifier is technically possible but HIGHLY unlikely
+                        outputICS.Add($"UID:{rawTextTimeFormat + rand.Next(1, 99999)}@example.com");
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
                         outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
                         outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
                             $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
 
-                        // add time so the next vaccination is scheduled correctly 
-                        currentDate = tempDate; 
+                        // update time so next set of vaccinations are scheduled correctly
+                        currentDate = tempDate;
                     }
                     else
                     {
@@ -217,7 +227,7 @@ namespace Schedule
                             currentDate.Day, 0, 0, 0);
                         currentDate = currentDate.Add(scheduleInfo.StartTime);
                         timeLimit = timeLimit.AddDays(1);
-                        goto NewDay;
+                        goto NewDay; // <-- goto 
                     }
 
                     outputICS.Add("END:VEVENT");
