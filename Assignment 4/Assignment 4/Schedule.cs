@@ -200,24 +200,27 @@ namespace Schedule
                     END:VCALENDAR
                  */
 
+                // initial values used to handle start/stop times for vaccination on day one 
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
 
                 foreach (string vaccination in priorityOrder)
                 {
+                    string[] vaccinationInfo = vaccination.Split(',');
+
                     outputICS.Add("BEGIN:VEVENT");
 
-                NewDay: // <-- goto point
+                NewDay: // <-- goto point, helps schedule EVERY element in priorityOrder
                     DateTime tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                     if (tempDate < timeLimit)
                     {
-                        string dateformatICS = currentDate.ToString("yyyyMMdd") +
+                        string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
-                        outputICS.Add($"UID:{dateformatICS}@example.com");
-                        outputICS.Add($"DTSTAMP:{dateformatICS}");
-                        outputICS.Add($"DTSTART:{dateformatICS}");
-                        outputICS.Add($"DTEND:{dateformatICS}");
+                        outputICS.Add($"UID:{rawTextTimeFormat}@example.com");
+                        outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
+                        outputICS.Add($"DTSTART:{rawTextTimeFormat}");
+                        outputICS.Add($"DTEND:{rawTextTimeFormat}");
                         outputICS.Add($"SUMMARY:Namn,Namnsson,19950202-2244,Doser: 1");
 
                         // add time so the next vaccination is scheduled correctly 
@@ -225,8 +228,12 @@ namespace Schedule
                     }
                     else
                     {
-                        currentDate.AddDays(1).Add(scheduleInfo.VaccinationTime); // update currentdate and
-                        timeLimit.AddDays(1);                       // timeLimit when end of day is reached 
+                        // update currentdate and timeLimit when end of day is reached
+                        currentDate = currentDate.AddDays(1);
+                        currentDate = new DateTime(currentDate.Year, currentDate.Month,
+                            currentDate.Day, 0, 0, 0);
+                        currentDate = currentDate.Add(scheduleInfo.StartTime);
+                        timeLimit = timeLimit.AddDays(1);
                         goto NewDay;
                     }
 
