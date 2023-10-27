@@ -3,7 +3,7 @@
 namespace Test
 {
     [TestClass]
-    public class VaccinationOrder
+    public class CreateVaccinationOrder
     {
         [TestMethod]
         public void BaseFunctionalityTest() // Jakobs test from starter code 
@@ -258,6 +258,16 @@ namespace Test
                     "19400706-6666,Svensson,Jan,2",
                 };
             CollectionAssert.AreEqual(expectedOutput, output);
+
+        }
+    }
+
+    [TestClass]
+    public class PriorityOrderToICSRawText
+    {
+        [TestMethod]
+        public void ExampleTest()
+        {
 
         }
     }

@@ -154,7 +154,7 @@ namespace Schedule
         }
 
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICS(string[] priorityOrder, Info scheduleInfo)
+        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo)
         {
             var outputICS = new List<string>(); // output list
 
