@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Schedule;
 using System;
 
@@ -267,10 +268,10 @@ namespace Test
     [TestClass]
     public class ScheduleTests
     {
-        [TestMethod]
-        public void ExampleTest()
+        [TestMethod]                        
+        public void StandardValuesTest()
         {
-            string[] priorityOrder = new string[] { "Name,Namesson,19950202-2244,1", "AnotherName,AnotherNamesson,19900101-1122,2" };
+            string[] priorityOrder = {"Ida,Berg,19940202-2244,1", "Janne,Svensson,19320101-1122,2"};
             Schedule.Info scheduleInfo = new Schedule.Info
             {
                 StartDate = new DateTime(2023, 11, 1),
@@ -279,12 +280,23 @@ namespace Test
                 VaccinationTime = new TimeSpan(0, 5, 0)
             };
 
-            // Act
-            //string[] result = Schedule.PriorityOrderToICSRawText(priorityOrder, scheduleInfo);
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder, scheduleInfo);
 
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.Length > 0);
+            string[] expectedOutput =
+            {
+               "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                "BEGIN:VEVENT",
+                "UID:19970714T170000@example.com",
+                "DTSTAMP:19970714T170000",
+                "DTSTART:19970714T170000",
+                "DTEND:19970715T040000",
+                "SUMMARY:Namn,Namnsson,19900101-1234,Doser=2",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            };
+                CollectionAssert.AreEqual(expectedOutput, result);
         }
     }
 }
