@@ -99,10 +99,12 @@ namespace Schedule
                             Vaccination.Program.VaccinateChildren);
 
                         var icsRawText = new List<string>();
+                        var rand = new Random();
 
                         try
                         {
-                            icsRawText = PriorityOrderToICSRawText(priorityOrder, newSchedule).ToList();
+                            icsRawText = PriorityOrderToICSRawText(priorityOrder, 
+                                newSchedule, rand.Next).ToList();
                             File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
                             Console.WriteLine("Vaccinations-schema har skapats.");
                             Console.WriteLine();
@@ -166,8 +168,15 @@ namespace Schedule
             }
         }
 
+        public static int GetRandomInt()
+        {
+            return new Random().Next(1, 100000);
+        }
+
         // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo)
+        // Func<int> rand parameter is for testing purposes, when this method is called it should be a Random()
+        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo,
+            Func<int> rand)
         {
             // priorityOrder must be greater than 0, throws ArgumentException if not
             if (priorityOrder.Length > 0)
@@ -183,7 +192,6 @@ namespace Schedule
                 // initial values used to handle start/stop times for vaccination on day one 
                 DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
-                var rand = new Random(); // for UID 
 
                 // counter gets incremented by 1 if an element is succesfully added to the output-list
                 for (int i = 0; i < priorityOrder.Length; i++)
@@ -208,8 +216,8 @@ namespace Schedule
                         string rawTextTimeFormatPlusVaccinationTime = 
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
-                        // same identifier is technically possible but HIGHLY unlikely
-                        outputICS.Add($"UID:{rawTextTimeFormat + rand.Next(1, 99999)}@example.com");
+                        // same identifier (UID) is technically possible but HIGHLY unlikely
+                        outputICS.Add($"UID:{rawTextTimeFormat + rand()}@example.com");
                         outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
                         outputICS.Add($"DTSTART:{rawTextTimeFormat}");
                         outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
