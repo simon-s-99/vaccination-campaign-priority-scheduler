@@ -211,7 +211,6 @@ namespace Vaccination
             // Return-list
             var output = new List<string>();
             foreach (Patient.Person person in sortedPeople)
-
             {
                 int administeredDose = 2; // default state is 2 doses 
                 if (person.HasHadInfection == 1) { administeredDose = 1; }
