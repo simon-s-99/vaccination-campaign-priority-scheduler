@@ -14,16 +14,16 @@ namespace Vaccination
 {
     public class Program
     {
+        // global/static so that these can be reached from PriorityOrderToICSRawText() in Schedule.cs 
+        public static int doses = 0;
+        public static bool vaccinateChildren = false;
+        public static string inputCSVFilepath = string.Empty;
+
         public static void Main()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            int doses = 0;
-            bool vaccinateChildren = false;
-
-            string inputCSVFilepath = string.Empty;
             string outputCSVFilepath = string.Empty;
-
             var schedule = new Schedule.Info(); // holds all scheduling info 
 
             while (true)
