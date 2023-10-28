@@ -447,4 +447,3 @@ namespace Vaccination
         }
     }
 }
-
