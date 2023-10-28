@@ -466,5 +466,32 @@ namespace Test
 
             CollectionAssert.AreEqual(expected, result);
         }
+
+        [TestMethod]
+        public void EmptyPriorityOrder() //an empty priorityOrder throws ArgumentException, passes if it is thrown
+        {
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2023, 11, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(8, 5, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 4, 0);
+            schedule.ConcurrentVaccinations = 1;
+
+            string[] priorityOrder = Array.Empty<string>();
+
+            try
+            {
+                string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
+                    schedule, FixedUIDAddon);
+            }
+            catch (ArgumentException)
+            {
+                Assert.AreEqual(true, true);
+            }
+            catch
+            {
+                Assert.AreEqual(true, false); // fail test if any other type of argument is thrown 
+            }
+        }
     }
 }
