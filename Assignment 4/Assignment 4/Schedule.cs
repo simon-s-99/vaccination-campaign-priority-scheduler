@@ -38,8 +38,6 @@ namespace Schedule
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
         public static Info ScheduleMenu(Info schedule)
         {
-            var newSchedule = schedule;
-
             while (true)
             {
                 Console.WriteLine("Schemalägg vaccinationer");
@@ -48,12 +46,12 @@ namespace Schedule
 
                 int scheduleMenu = Vaccination.Program.ShowMenu("", new[]
                 {
-                    $"Startdatum: {newSchedule.StartDate.ToString("yyyy-MM-dd")}",
-                    $"Starttid: {newSchedule.StartTime.ToString("hh\\:mm")}",
-                    $"Sluttid: {newSchedule.EndTime.ToString("hh\\:mm")}",
-                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {newSchedule.VaccinationTime.TotalMinutes}",
-                    $"Kalenderfil: {newSchedule.FilePathICS}",
+                    $"Startdatum: {schedule.StartDate.ToString("yyyy-MM-dd")}",
+                    $"Starttid: {schedule.StartTime.ToString("hh\\:mm")}",
+                    $"Sluttid: {schedule.EndTime.ToString("hh\\:mm")}",
+                    $"Antal samtidiga vaccinationer: {schedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {schedule.VaccinationTime.TotalMinutes}",
+                    $"Kalenderfil: {schedule.FilePathICS}",
                     "Generera kalenderfil (.ics)",
                     "Gå tillbaka till huvudmeny"
                 });
@@ -62,36 +60,36 @@ namespace Schedule
 
                 if (scheduleMenu == 0) //Change the start date for vaccinations
                 {
-                    newSchedule.StartDate = VaccinationStartDate();
+                    schedule.StartDate = VaccinationStartDate();
                 }
                 else if (scheduleMenu == 1) //Change the start time for vaccinations
                 {
-                    newSchedule.StartTime = VaccinationStartTime(newSchedule);
+                    schedule.StartTime = VaccinationStartTime(schedule);
                 }
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
-                    newSchedule.EndTime = VaccinationEndTime(newSchedule);
+                    schedule.EndTime = VaccinationEndTime(schedule);
                 }
                 //Change the number of people that's allowed to get vaccinated at the same time
                 else if (scheduleMenu == 3)
                 {
-                    newSchedule.ConcurrentVaccinations = ConcurrentVaccinations();
+                    schedule.ConcurrentVaccinations = ConcurrentVaccinations();
                 }
                 else if (scheduleMenu == 4) //Change how many minutes each vaccination should take.
                 {
-                    newSchedule.VaccinationTime = VaccinatonDuration();
+                    schedule.VaccinationTime = VaccinatonDuration();
                 }
                 else if (scheduleMenu == 5) //Choose where to save the calendar .ics file.
                 {
                     Console.WriteLine("Var vill du att .ics filen ska sparas?");
 
-                    newSchedule.FilePathICS = ChangeFilePathICS();
+                    schedule.FilePathICS = ChangeFilePathICS();
                 }
                 else if (scheduleMenu == 6) // generate the .ics file 
                 {
-                    CreateScheduleICSFile(newSchedule);
+                    CreateScheduleICSFile(schedule);
                 }
-                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
+                else { return schedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
         }
         
