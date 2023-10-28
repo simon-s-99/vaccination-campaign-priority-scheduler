@@ -36,10 +36,8 @@ namespace Schedule
     public class SubMenu
     {
         // method for scheduling vaccinations, main menu points here and treats this as a sub-menu 
-        public static Info ScheduleMenu(Info schedule)
+        public static Info ScheduleMenu(Schedule.Info schedule)
         {
-            var newSchedule = schedule;
-
             while (true)
             {
                 Console.WriteLine("Schemalägg vaccinationer");
@@ -48,12 +46,12 @@ namespace Schedule
 
                 int scheduleMenu = Vaccination.Program.ShowMenu("", new[]
                 {
-                    $"Startdatum: {newSchedule.StartDate.ToString("yyyy-MM-dd")}",
-                    $"Starttid: {newSchedule.StartTime.ToString("hh\\:mm")}",
-                    $"Sluttid: {newSchedule.EndTime.ToString("hh\\:mm")}",
-                    $"Antal samtidiga vaccinationer: {newSchedule.ConcurrentVaccinations}",
-                    $"Minuter per vaccination: {newSchedule.VaccinationTime.TotalMinutes}",
-                    $"Kalenderfil: {newSchedule.FilePathICS}",
+                    $"Startdatum: {schedule.StartDate.ToString("yyyy-MM-dd")}",
+                    $"Starttid: {schedule.StartTime.ToString("hh\\:mm")}",
+                    $"Sluttid: {schedule.EndTime.ToString("hh\\:mm")}",
+                    $"Antal samtidiga vaccinationer: {schedule.ConcurrentVaccinations}",
+                    $"Minuter per vaccination: {schedule.VaccinationTime.TotalMinutes}",
+                    $"Kalenderfil: {schedule.FilePathICS}",
                     "Generera kalenderfil (.ics)",
                     "Gå tillbaka till huvudmeny"
                 });
@@ -62,186 +60,36 @@ namespace Schedule
 
                 if (scheduleMenu == 0) //Change the start date for vaccinations
                 {
-                    newSchedule.StartDate = VaccinationStartDate();
+                    schedule.StartDate = VaccinationStartDate();
                 }
                 else if (scheduleMenu == 1) //Change the start time for vaccinations
                 {
-                    newSchedule.StartTime = VaccinationStartTime(newSchedule);
+                    schedule.StartTime = VaccinationStartTime(schedule);
                 }
                 else if (scheduleMenu == 2) //Change the the end time for vacciantions
                 {
-                    newSchedule.EndTime = VaccinationEndTime(newSchedule);
+                    schedule.EndTime = VaccinationEndTime(schedule);
                 }
                 //Change the number of people that's allowed to get vaccinated at the same time
                 else if (scheduleMenu == 3)
                 {
-                    newSchedule.ConcurrentVaccinations = ConcurrentVaccinations();
+                    schedule.ConcurrentVaccinations = ConcurrentVaccinations();
                 }
                 else if (scheduleMenu == 4) //Change how many minutes each vaccination should take.
                 {
-                    newSchedule.VaccinationTime = VaccinatonDuration();
+                    schedule.VaccinationTime = VaccinatonDuration();
                 }
                 else if (scheduleMenu == 5) //Choose where to save the calendar .ics file.
                 {
                     Console.WriteLine("Var vill du att .ics filen ska sparas?");
 
-                    newSchedule.FilePathICS = ChangeFilePathICS();
+                    schedule.FilePathICS = ChangeFilePathICS();
                 }
                 else if (scheduleMenu == 6) // generate the .ics file 
                 {
-                    if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
-                        Vaccination.Program.Doses > 0)
-                    {
-                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
-                        string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
-                            inputCSV,
-                            Vaccination.Program.Doses,
-                            Vaccination.Program.VaccinateChildren);
-
-                        var icsRawText = new List<string>();
-                        var rand = new Random();
-
-                        try
-                        {
-                            icsRawText = PriorityOrderToICSRawText(priorityOrder, 
-                                newSchedule, rand.Next).ToList();
-                            File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
-                            Console.WriteLine("Vaccinations-schema har skapats.");
-                            Console.WriteLine();
-                        }
-                        catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
-                        {
-                            Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
-                            Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
-                            Console.WriteLine();
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
-                        Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
-                        Console.WriteLine();
-                    }
+                    CreateScheduleICSFile(schedule);
                 }
-                else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
-            }
-        }
-        
-        public static string ChangeFilePathICS()
-        {
-            while (true)
-            {
-                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.ics)");
-                Console.WriteLine("---------------");
-                Console.Write("Ny filsökväg: ");
-                string newPath = Console.ReadLine().Trim();
-
-                Console.Clear();
-
-                if (Path.IsPathFullyQualified(newPath))
-                {
-                    // get file-extension if there is one
-                    string fileName = Path.GetFileName(newPath);
-                    string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
-
-                    // for comparison of the illegal characters in a filename \/:*?"<>|
-                    // IndexOfAny returns -1 if none of the chars are found in the string 
-                    string illegalCharacters = "\\/:*?\"<>|";
-                    if (fileName.IndexOfAny(illegalCharacters.ToCharArray()) == -1)
-                    {
-                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
-                        if (Directory.Exists(tempPath))
-                        {
-                            if (fileExtension == "ics" || fileExtension == "ICS")
-                            {
-                                return newPath;
-                            }
-                        }
-                    }
-                }
-
-                // tell user to try again
-                Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
-                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.ics/.ICS)");
-                Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
-                Console.WriteLine();
-            }
-        }
-
-        // takes vaccination priority order as input (string[]) and returns the lines for the ics file
-        // Func<int> rand parameter is for testing purposes, when this method is called it should be a Random()
-        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo,
-            Func<int> rand)
-        {
-            // priorityOrder must be greater than 0, throws ArgumentException if not
-            if (priorityOrder.Length > 0)
-            {
-                // output list with the first template values of a raw text ics-file 
-                var outputICS = new List<string>
-                {
-                    "BEGIN:VCALENDAR",
-                    "VERSION:2.0",
-                    "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
-                };
-
-                // initial values used to handle start/stop times
-                DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
-                DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
-
-                int concurrentVaccinationsDone = 0;
-                for (int i = 0; i < priorityOrder.Length; i++)
-                {
-                    // updates currentDate after every set of vaccinations
-                    if (concurrentVaccinationsDone == scheduleInfo.ConcurrentVaccinations)
-                    {
-                        currentDate = currentDate.Add(scheduleInfo.VaccinationTime);
-                        concurrentVaccinationsDone = 0;
-                    }
-
-                    string[] vaccinationInfo = priorityOrder[i].Split(',');
-
-                    outputICS.Add("BEGIN:VEVENT");
-
-                    NewDay: // <--- goto point 
-                    var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
-                    if (tempDate < timeLimit)
-                    {
-                        string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
-                            "T" + currentDate.ToString("HHmmss");
-
-                        string rawTextTimeFormatPlusVaccinationTime = 
-                            tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
-
-                        // same identifier (UID) is technically possible but HIGHLY unlikely
-                        outputICS.Add($"UID:{rawTextTimeFormat + rand()}@example.com");
-                        outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
-                        outputICS.Add($"DTSTART:{rawTextTimeFormat}");
-                        outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
-                        outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
-                            $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
-                    }
-                    else
-                    {
-                        // update currentdate and timeLimit when end of day is reached
-                        currentDate = currentDate.AddDays(1);
-                        currentDate = new DateTime(currentDate.Year, currentDate.Month,
-                            currentDate.Day, 0, 0, 0);
-                        currentDate = currentDate.Add(scheduleInfo.StartTime);
-                        timeLimit = timeLimit.AddDays(1);
-                        goto NewDay; // <-- goto 
-                    }
-
-                    outputICS.Add("END:VEVENT");
-                    concurrentVaccinationsDone++; 
-                }
-
-                outputICS.Add("END:VCALENDAR"); // ends ics file-template 
-
-                return outputICS.ToArray();
-            }
-            else
-            {
-                throw new ArgumentException("Parameter priorityOrder[] must be greater than 0.");
+                else { return schedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
         }
 
@@ -415,6 +263,161 @@ namespace Schedule
                     Console.WriteLine("Felaktigt tidsformat. Ange vaccinationtiden i minuter.");
                     Console.WriteLine();
                 }
+            }
+        }
+
+        public static string ChangeFilePathICS()
+        {
+            while (true)
+            {
+                Console.WriteLine("(Ex.: C:\\Windows\\Temp\\exempel.ics)");
+                Console.WriteLine("---------------");
+                Console.Write("Ny filsökväg: ");
+                string newPath = Console.ReadLine().Trim();
+
+                Console.Clear();
+
+                if (Path.IsPathFullyQualified(newPath))
+                {
+                    // get file-extension if there is one
+                    string fileName = Path.GetFileName(newPath);
+                    string fileExtension = fileName.Substring(fileName.LastIndexOf('.') + 1);
+
+                    // for comparison of the illegal characters in a filename \/:*?"<>|
+                    // IndexOfAny returns -1 if none of the chars are found in the string 
+                    string illegalCharacters = "\\/:*?\"<>|";
+                    if (fileName.IndexOfAny(illegalCharacters.ToCharArray()) == -1)
+                    {
+                        string tempPath = newPath.Substring(0, newPath.LastIndexOf("\\"));
+                        if (Directory.Exists(tempPath))
+                        {
+                            if (fileExtension == "ics" || fileExtension == "ICS")
+                            {
+                                return newPath;
+                            }
+                        }
+                    }
+                }
+
+                // tell user to try again
+                Console.WriteLine("Sökvägen du angett är ogiltig, ange en giltig filsökväg.");
+                Console.WriteLine("Tänk på att välja rätt fil-ändelse (.ics/.ICS)");
+                Console.WriteLine("Filnamnet får inte innehålla något av följande tecken: \\/:*?\"<>|");
+                Console.WriteLine();
+            }
+        }
+
+        // takes vaccination priority order as input (string[]) and returns the lines for the ics file
+        // Func<int> rand parameter is for testing purposes, when this method is called it should be a Random()
+        public static string[] PriorityOrderToICSRawText(string[] priorityOrder, Info scheduleInfo,
+            Func<int> rand)
+        {
+            // priorityOrder must be greater than 0, throws ArgumentException if not
+            if (priorityOrder.Length > 0)
+            {
+                // output list with the first template values of a raw text ics-file 
+                var outputICS = new List<string>
+                {
+                    "BEGIN:VCALENDAR",
+                    "VERSION:2.0",
+                    "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                };
+
+                // initial values used to handle start/stop times
+                DateTime currentDate = scheduleInfo.StartDate.Add(scheduleInfo.StartTime);
+                DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
+
+                int concurrentVaccinationsDone = 0;
+                for (int i = 0; i < priorityOrder.Length;) // counter increments in for-loop
+                {
+                    // updates currentDate after every set of vaccinations
+                    if (concurrentVaccinationsDone == scheduleInfo.ConcurrentVaccinations)
+                    {
+                        currentDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                        concurrentVaccinationsDone = 0;
+                    }
+
+                    string[] vaccinationInfo = priorityOrder[i].Split(',');
+
+                    var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
+                    if (tempDate < timeLimit)
+                    {
+                        outputICS.Add("BEGIN:VEVENT");
+
+                        string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
+                            "T" + currentDate.ToString("HHmmss");
+
+                        string rawTextTimeFormatPlusVaccinationTime = 
+                            tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
+
+                        // same identifier (UID) is technically possible but HIGHLY unlikely
+                        outputICS.Add($"UID:{rawTextTimeFormat + rand()}@example.com");
+                        outputICS.Add($"DTSTAMP:{rawTextTimeFormat}");
+                        outputICS.Add($"DTSTART:{rawTextTimeFormat}");
+                        outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
+                        outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
+                            $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
+
+                        outputICS.Add("END:VEVENT");
+
+                        concurrentVaccinationsDone++;
+                        i++; // <-------------------------- COUNTER INCREMENTS HERE (after adding an event)
+                    }
+                    else
+                    {
+                        // update currentdate and timeLimit when end of day is reached
+                        currentDate = currentDate.AddDays(1);
+                        currentDate = new DateTime(currentDate.Year, currentDate.Month,
+                            currentDate.Day, 0, 0, 0);
+                        currentDate = currentDate.Add(scheduleInfo.StartTime);
+                        timeLimit = timeLimit.AddDays(1);
+                    }
+                }
+
+                outputICS.Add("END:VCALENDAR"); // ends ics file-template 
+
+                return outputICS.ToArray();
+            }
+            else
+            {
+                throw new ArgumentException("Parameter priorityOrder[] must be greater than 0.");
+            }
+        }
+
+        public static void CreateScheduleICSFile(Schedule.Info schedule)
+        {
+            if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses > 0)
+            {
+                string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
+                string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
+                    inputCSV,
+                    Vaccination.Program.Doses,
+                    Vaccination.Program.VaccinateChildren);
+
+                var icsRawText = new List<string>();
+                var rand = new Random();
+
+                try
+                {
+                    icsRawText = PriorityOrderToICSRawText(priorityOrder,
+                        schedule, rand.Next).ToList();
+                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                    Console.WriteLine("Vaccinations-schema har skapats.");
+                    Console.WriteLine();
+                }
+                catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
+                {
+                    Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
+                    Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
+                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
+                Console.WriteLine();
             }
         }
     }
