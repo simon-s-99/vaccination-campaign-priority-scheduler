@@ -328,7 +328,7 @@ namespace Schedule
                 DateTime timeLimit = scheduleInfo.StartDate.Add(scheduleInfo.EndTime);
 
                 int concurrentVaccinationsDone = 0;
-                for (int i = 0; i < priorityOrder.Length; i++)
+                for (int i = 0; i < priorityOrder.Length;) // counter increments in for-loop
                 {
                     // updates currentDate after every set of vaccinations
                     if (concurrentVaccinationsDone == scheduleInfo.ConcurrentVaccinations)
@@ -339,12 +339,11 @@ namespace Schedule
 
                     string[] vaccinationInfo = priorityOrder[i].Split(',');
 
-                    outputICS.Add("BEGIN:VEVENT");
-
-                    NewDay: // <--- goto point 
                     var tempDate = currentDate.Add(scheduleInfo.VaccinationTime);
                     if (tempDate < timeLimit)
                     {
+                        outputICS.Add("BEGIN:VEVENT");
+
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
@@ -358,6 +357,11 @@ namespace Schedule
                         outputICS.Add($"DTEND:{rawTextTimeFormatPlusVaccinationTime}");
                         outputICS.Add($"SUMMARY:{vaccinationInfo[0]},{vaccinationInfo[1]}," +
                             $"{vaccinationInfo[2]},Doser={vaccinationInfo[3]}");
+
+                        outputICS.Add("END:VEVENT");
+
+                        concurrentVaccinationsDone++;
+                        i++; // <-------------------------- COUNTER INCREMENTS HERE (after adding an event)
                     }
                     else
                     {
@@ -367,11 +371,7 @@ namespace Schedule
                             currentDate.Day, 0, 0, 0);
                         currentDate = currentDate.Add(scheduleInfo.StartTime);
                         timeLimit = timeLimit.AddDays(1);
-                        goto NewDay; // <-- goto 
                     }
-
-                    outputICS.Add("END:VEVENT");
-                    concurrentVaccinationsDone++; 
                 }
 
                 outputICS.Add("END:VCALENDAR"); // ends ics file-template 
