@@ -89,39 +89,7 @@ namespace Schedule
                 }
                 else if (scheduleMenu == 6) // generate the .ics file 
                 {
-                    if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
-                        Vaccination.Program.Doses > 0)
-                    {
-                        string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
-                        string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
-                            inputCSV,
-                            Vaccination.Program.Doses,
-                            Vaccination.Program.VaccinateChildren);
-
-                        var icsRawText = new List<string>();
-                        var rand = new Random();
-
-                        try
-                        {
-                            icsRawText = PriorityOrderToICSRawText(priorityOrder, 
-                                newSchedule, rand.Next).ToList();
-                            File.WriteAllLines(newSchedule.FilePathICS, icsRawText.ToArray());
-                            Console.WriteLine("Vaccinations-schema har skapats.");
-                            Console.WriteLine();
-                        }
-                        catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
-                        {
-                            Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
-                            Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
-                            Console.WriteLine();
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
-                        Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
-                        Console.WriteLine();
-                    }
+                    CreateScheduleICSFile(newSchedule);
                 }
                 else { return newSchedule; } // exits this sub-menu and goes back to main-menu (main-loop) 
             }
@@ -415,6 +383,43 @@ namespace Schedule
                     Console.WriteLine("Felaktigt tidsformat. Ange vaccinationtiden i minuter.");
                     Console.WriteLine();
                 }
+            }
+        }
+
+        public static void CreateScheduleICSFile(Schedule.Info schedule)
+        {
+            if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses > 0)
+            {
+                string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
+                string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
+                    inputCSV,
+                    Vaccination.Program.Doses,
+                    Vaccination.Program.VaccinateChildren);
+
+                var icsRawText = new List<string>();
+                var rand = new Random();
+
+                try
+                {
+                    icsRawText = PriorityOrderToICSRawText(priorityOrder,
+                        schedule, rand.Next).ToList();
+                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                    Console.WriteLine("Vaccinations-schema har skapats.");
+                    Console.WriteLine();
+                }
+                catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
+                {
+                    Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
+                    Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
+                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
+                Console.WriteLine();
             }
         }
     }
