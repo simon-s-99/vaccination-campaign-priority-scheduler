@@ -271,7 +271,7 @@ namespace Vaccination
                 Console.WriteLine("Ändra antal vaccindoser");
                 Console.WriteLine("-----------------");
                 Console.Write("Ange nytt antal doser: ");
-
+                
                 try
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
