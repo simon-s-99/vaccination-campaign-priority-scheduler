@@ -52,8 +52,6 @@ namespace Vaccination
 
                 if (mainMenu == 0) // create priority order 
                 {
-                    Console.Clear();
-
                     if (InputCSVFilepath != string.Empty &&
                         outputCSVFilepath != string.Empty &&
                         Doses >= 1)
