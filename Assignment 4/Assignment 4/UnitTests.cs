@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Schedule;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace Test
