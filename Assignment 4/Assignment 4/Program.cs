@@ -26,7 +26,7 @@ namespace Vaccination
             {
                 Console.WriteLine("Huvudmeny");
                 Console.WriteLine("----------");
-                Console.WriteLine($"Antal tillängliga vaccindoser {Doses}");
+                Console.WriteLine($"Antal tillängliga vaccindoser: {Doses}");
 
                 string ageRestriction = VaccinateChildren ? "ja" : "nej";
                 Console.WriteLine($"Vaccinering under 18 år: {ageRestriction}");
@@ -227,7 +227,7 @@ namespace Vaccination
         }
 
         // outputs array to filepath, associated with CreateVaccinationOrder() in main menu-context 
-        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filepath)
         {
             if (priorityOrder.Length == 0)
             {
@@ -236,7 +236,7 @@ namespace Vaccination
                 Console.WriteLine();
                 return;
             }
-            else if (File.Exists(filePath))
+            else if (File.Exists(filepath))
             {
                 int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
                 {
@@ -250,14 +250,12 @@ namespace Vaccination
                 {
                     Console.WriteLine("Filen har inte sparats.");
                     Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
-                    Console.WriteLine();
                     return;
                 }
             }
 
-            File.WriteAllLines(filePath, priorityOrder);
-            Console.WriteLine("Prioritetsordningen har sparats.");
-            Console.WriteLine();
+            File.WriteAllLines(filepath, priorityOrder);
+            Console.WriteLine($"Prioritetsordningen har sparats i {filepath}");
         }
 
         public static int ChangeVaccineDosages()
@@ -267,17 +265,22 @@ namespace Vaccination
                 Console.WriteLine("Ändra antal vaccindoser");
                 Console.WriteLine("-----------------");
                 Console.Write("Ange nytt antal doser: ");
-                
+
                 try
                 {
                     int newVaccineDosages = int.Parse(Console.ReadLine());
                     Console.Clear();
-                    return newVaccineDosages; // Return the new value of vaccine dosages, changed by the user.
+
+                    if (newVaccineDosages > 0) // guarantees at least one dose 
+                    {
+                        return newVaccineDosages;
+                    }
+                    else { throw new FormatException(); }
                 }
                 catch (FormatException)
                 {
                     Console.Clear();
-                    Console.WriteLine("Vänligen ange vaccindoseringarna i heltal.");
+                    Console.WriteLine("Vänligen ange vaccindoseringar som ett positivt heltal.");
                     Console.WriteLine();
                 }
             }

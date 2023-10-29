@@ -91,7 +91,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange nytt startdatum (YYYY-MM-DD): ");
+                Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -116,7 +116,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
+                Console.Write("Ange ny starttid (ex.: 12:00) : ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -130,7 +130,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch (FormatException)
+                catch
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
@@ -152,7 +152,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange ny sluttid. t.ex.: 20:00");
+                Console.Write("Ange ny sluttid (ex.: 20:00) : ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -166,7 +166,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch (FormatException)
+                catch
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
@@ -188,7 +188,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Hur många personer ska kunna vaccineras samtidigt?");
+                Console.Write("Hur många personer ska kunna vaccineras samtidigt: ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -224,10 +224,10 @@ namespace Schedule
 
         public static TimeSpan VaccinatonDuration()
         {
-            
+
             while (true)
             {
-                Console.WriteLine("Hur länge ska varje vaccination vara (i minuter)?");
+                Console.Write("Hur länge ska varje vaccination vara (i minuter): ");
                 string input = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(input))
@@ -242,7 +242,7 @@ namespace Schedule
                     {
                         Console.Clear();
                         TimeSpan vaccinationTime = new TimeSpan(0, minutes, 0);
-                        return vaccinationTime;                 
+                        return vaccinationTime;
                     }
                     else
                     {
@@ -270,6 +270,11 @@ namespace Schedule
                 string newPath = Console.ReadLine().Trim();
 
                 Console.Clear();
+
+                if (string.IsNullOrEmpty(newPath)) // standard value if user input is empty 
+                {
+                    return "C:\\Windows\\Temp\\Schedule.ics";
+                }
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
@@ -341,7 +346,7 @@ namespace Schedule
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
-                        string rawTextTimeFormatPlusVaccinationTime = 
+                        string rawTextTimeFormatPlusVaccinationTime =
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
                         // same identifier (UID) is technically possible but HIGHLY unlikely
@@ -380,8 +385,14 @@ namespace Schedule
 
         public static void CreateScheduleICSFile(Schedule.Info schedule)
         {
-            if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
-                        Vaccination.Program.Doses > 0)
+            if (string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses < 1)
+            {
+                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
+                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
+                Console.WriteLine();
+            }
+            else
             {
                 string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
                 string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
@@ -390,28 +401,53 @@ namespace Schedule
                     Vaccination.Program.VaccinateChildren);
 
                 var icsRawText = new List<string>();
-                var rand = new Random();
+
+                Console.Clear();
 
                 try
                 {
                     icsRawText = PriorityOrderToICSRawText(priorityOrder,
-                        schedule, rand.Next).ToList();
-                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
-                    Console.WriteLine("Vaccinations-schema har skapats.");
-                    Console.WriteLine();
+                        schedule, new Random().Next).ToList();
                 }
                 catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
                 {
                     Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
                     Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
                     Console.WriteLine();
+                    return;
                 }
-            }
-            else
-            {
-                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
-                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
-                Console.WriteLine();
+
+                if (File.Exists(schedule.FilePathICS))
+                {
+                    int overwriteMenu = Vaccination.Program.ShowMenu($"Filen existerar redan. Vill du skriva över den?",
+                        new[]
+                    {
+                        "Ja",
+                        "Nej"
+                    });
+
+                    Console.Clear();
+
+                    if (overwriteMenu == 0)
+                    {
+                        File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                        Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
+                        Console.WriteLine();
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Inget schema har skapats, ändra kalenderns filsökväg om du vill " +
+                            "skapa en .ics fil.");
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                    Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
+                    Console.WriteLine();
+                }
             }
         }
     }
