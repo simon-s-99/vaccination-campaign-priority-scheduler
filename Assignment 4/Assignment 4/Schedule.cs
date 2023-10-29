@@ -402,18 +402,50 @@ namespace Schedule
 
                 var icsRawText = new List<string>();
 
+                Console.Clear();
+
                 try
                 {
                     icsRawText = PriorityOrderToICSRawText(priorityOrder,
                         schedule, new Random().Next).ToList();
-                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
-                    Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
-                    Console.WriteLine();
                 }
                 catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
                 {
                     Console.WriteLine("Fel vid försök att skapa en prioritetsordning.");
                     Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
+                    Console.WriteLine();
+                    return;
+                }
+
+                if (File.Exists(schedule.FilePathICS))
+                {
+                    int overwriteMenu = Vaccination.Program.ShowMenu($"Filen existerar redan. Vill du skriva över den?",
+                        new[]
+                    {
+                        "Ja",
+                        "Nej"
+                    });
+
+                    Console.Clear();
+
+                    if (overwriteMenu == 0) 
+                    {
+                        File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                        Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
+                        Console.WriteLine();
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Inget schema har skapats, ändra kalenderns filsökväg om du vill " +
+                            "skapa en .ics fil.");
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
+                    Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
                     Console.WriteLine();
                 }
             }

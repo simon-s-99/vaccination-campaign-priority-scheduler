@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
+// Samuel Lööf & Simon Sörqvist, uppgift 4
+
 namespace Test
 {
     [TestClass]
