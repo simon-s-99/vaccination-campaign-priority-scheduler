@@ -227,7 +227,7 @@ namespace Vaccination
         }
 
         // outputs array to filepath, associated with CreateVaccinationOrder() in main menu-context 
-        public static void PriorityOrderToCSV(string[] priorityOrder, string filePath)
+        public static void PriorityOrderToCSV(string[] priorityOrder, string filepath)
         {
             if (priorityOrder.Length == 0)
             {
@@ -236,7 +236,7 @@ namespace Vaccination
                 Console.WriteLine();
                 return;
             }
-            else if (File.Exists(filePath))
+            else if (File.Exists(filepath))
             {
                 int overwriteMenu = ShowMenu($"Filen existerar redan. Vill du skriva över den?", new[]
                 {
@@ -255,9 +255,8 @@ namespace Vaccination
                 }
             }
 
-            File.WriteAllLines(filePath, priorityOrder);
-            Console.WriteLine("Prioritetsordningen har sparats.");
-            Console.WriteLine();
+            File.WriteAllLines(filepath, priorityOrder);
+            Console.WriteLine($"Prioritetsordningen har sparats i {filepath}");
         }
 
         public static int ChangeVaccineDosages()
