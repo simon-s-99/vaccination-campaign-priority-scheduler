@@ -28,7 +28,7 @@ namespace Test
             Assert.AreEqual("19810203-2222,Efternamnsson,Eva,2", output[0]);
             Assert.AreEqual("19720906-1111,Elba,Idris,1", output[1]);
         }
-        
+
         [TestMethod]
         public void VaccinateChildrenFalse()
         {
@@ -49,7 +49,7 @@ namespace Test
             int doses = 100;
             bool vaccinateChildren = false;
 
-            string[] expected = 
+            string[] expected =
             {
                 "19860301-1212,Smittadsson,Kent,1",
                 "19921112-1912,Ek,Pontus,2",
@@ -69,7 +69,7 @@ namespace Test
         [TestMethod]
         public void VaccinateChildrenTrue()
         {
-            string[] input = 
+            string[] input =
             {
                 "9704201910,Olsson,Hans,0,0,0",
                 "201110101111,Ekblom,Josy,0,1,0",
@@ -83,7 +83,7 @@ namespace Test
             int doses = 50;
             bool vaccinateChildren = true;
 
-            string[] expected = 
+            string[] expected =
             {
                 "19980904-1944,Sten,Kajsa,2",
                 "20100102-1445,Blad,Hanna,1",

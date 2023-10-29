@@ -130,7 +130,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch 
+                catch
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
@@ -166,7 +166,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch 
+                catch
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
@@ -224,7 +224,7 @@ namespace Schedule
 
         public static TimeSpan VaccinatonDuration()
         {
-            
+
             while (true)
             {
                 Console.Write("Hur länge ska varje vaccination vara (i minuter): ");
@@ -242,7 +242,7 @@ namespace Schedule
                     {
                         Console.Clear();
                         TimeSpan vaccinationTime = new TimeSpan(0, minutes, 0);
-                        return vaccinationTime;                 
+                        return vaccinationTime;
                     }
                     else
                     {
@@ -346,7 +346,7 @@ namespace Schedule
                         string rawTextTimeFormat = currentDate.ToString("yyyyMMdd") +
                             "T" + currentDate.ToString("HHmmss");
 
-                        string rawTextTimeFormatPlusVaccinationTime = 
+                        string rawTextTimeFormatPlusVaccinationTime =
                             tempDate.ToString("yyyyMMdd") + "T" + tempDate.ToString("HHmmss");
 
                         // same identifier (UID) is technically possible but HIGHLY unlikely
@@ -428,7 +428,7 @@ namespace Schedule
 
                     Console.Clear();
 
-                    if (overwriteMenu == 0) 
+                    if (overwriteMenu == 0)
                     {
                         File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
                         Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
