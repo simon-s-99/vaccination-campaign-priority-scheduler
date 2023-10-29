@@ -250,7 +250,6 @@ namespace Vaccination
                 {
                     Console.WriteLine("Filen har inte sparats.");
                     Console.WriteLine("Ändra utdatafil från huvudmenyn om du vill skapa en prioritetsordning");
-                    Console.WriteLine();
                     return;
                 }
             }

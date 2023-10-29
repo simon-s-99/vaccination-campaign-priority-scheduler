@@ -91,7 +91,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange nytt startdatum (YYYY-MM-DD): ");
+                Console.Write("Ange nytt startdatum (YYYY-MM-DD): ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -116,7 +116,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange ny starttid. t.ex.: 12:00");
+                Console.Write("Ange ny starttid (ex.: 12:00) : ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -152,7 +152,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Ange ny sluttid. t.ex.: 20:00");
+                Console.Write("Ange ny sluttid (ex.: 20:00) : ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -188,7 +188,7 @@ namespace Schedule
         {
             while (true)
             {
-                Console.WriteLine("Hur många personer ska kunna vaccineras samtidigt?");
+                Console.Write("Hur många personer ska kunna vaccineras samtidigt: ");
                 string input = Console.ReadLine();
                 Console.Clear();
 
@@ -227,7 +227,7 @@ namespace Schedule
             
             while (true)
             {
-                Console.WriteLine("Hur länge ska varje vaccination vara (i minuter)?");
+                Console.Write("Hur länge ska varje vaccination vara (i minuter): ");
                 string input = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(input))
@@ -270,6 +270,11 @@ namespace Schedule
                 string newPath = Console.ReadLine().Trim();
 
                 Console.Clear();
+
+                if (string.IsNullOrEmpty(newPath)) // standard value if user input is empty 
+                {
+                    return "C:\\Windows\\Temp\\Schedule.ics";
+                }
 
                 if (Path.IsPathFullyQualified(newPath))
                 {
@@ -390,14 +395,13 @@ namespace Schedule
                     Vaccination.Program.VaccinateChildren);
 
                 var icsRawText = new List<string>();
-                var rand = new Random();
 
                 try
                 {
                     icsRawText = PriorityOrderToICSRawText(priorityOrder,
-                        schedule, rand.Next).ToList();
+                        schedule, new Random().Next).ToList();
                     File.WriteAllLines(schedule.FilePathICS, icsRawText.ToArray());
-                    Console.WriteLine("Vaccinations-schema har skapats.");
+                    Console.WriteLine($"Vaccinations-schemat har sparats i {schedule.FilePathICS}");
                     Console.WriteLine();
                 }
                 catch // here to catch ArgumentException if priorityOrder is empty (length < 0) 
