@@ -385,8 +385,14 @@ namespace Schedule
 
         public static void CreateScheduleICSFile(Schedule.Info schedule)
         {
-            if (!string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
-                        Vaccination.Program.Doses > 0)
+            if (string.IsNullOrEmpty(Vaccination.Program.InputCSVFilepath) ||
+                        Vaccination.Program.Doses < 1)
+            {
+                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
+                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
+                Console.WriteLine();
+            }
+            else
             {
                 string[] inputCSV = File.ReadAllLines(Vaccination.Program.InputCSVFilepath);
                 string[] priorityOrder = Vaccination.Program.CreateVaccinationOrder(
@@ -410,12 +416,6 @@ namespace Schedule
                     Console.WriteLine("Inget schema har skapats, vänligen försök igen.");
                     Console.WriteLine();
                 }
-            }
-            else
-            {
-                Console.WriteLine("Vänligen gå tillbaka till huvudmenyn och välj en");
-                Console.WriteLine("indatafil och mata in mängden tillgängliga doser vaccin.");
-                Console.WriteLine();
             }
         }
     }
