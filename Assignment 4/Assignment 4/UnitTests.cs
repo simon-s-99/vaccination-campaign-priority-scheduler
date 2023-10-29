@@ -271,6 +271,14 @@ namespace Test
         // this is used for testing PriorityOrderToICSRawText so we get a reliable/testable UID value 
         private int FixedUIDAddon() { return 99; }
 
+        /*
+         * IMPORTANT:
+         * Outputs from the following tests CAN NOT be put into an .ics (iCalendar) file
+         * the UID is not unique due to the use of FixedUIDAddon().
+         * Use the actual program or the actual PriorityOrderToICSRawText() with a random UID-addon
+         * if you want a functional .ics file. 
+         */
+
         [TestMethod]
         public void BaseFunctionalityTest() // basic test with default values for schedule 
         {
@@ -538,9 +546,111 @@ namespace Test
         }
 
         [TestMethod]
-        public void BigPriorityOrder()
+        public void BigPriorityOrder() // not really a BIG priorityOrder but bigger than the other tests
         {
+            var schedule = new Schedule.Info();
+            schedule.StartDate = new DateTime(2020, 1, 1);
+            schedule.StartTime = new TimeSpan(8, 0, 0);
+            schedule.EndTime = new TimeSpan(18, 0, 0);
+            schedule.VaccinationTime = new TimeSpan(0, 5, 0);
+            schedule.ConcurrentVaccinations = 2;
 
+            string[] priorityOrder =
+            {
+                "19320101-1122,Svensson,Janne,2",
+                "19400225-1324,Jansson,Bo,2",
+                "19450505-1123,Bengtsson,Ulrika,1",
+                "19470303-1929,Hansson,Hugo,2",
+                "19801111-1634,Olsson,Selma,2",
+                "19810324-1632,Lindqvist,Alma,1",
+                "19890419-2934,Sandberg,Noah,1",
+                "19910911-3922,Berg,Lilly,2",
+                "19990720-5443,Engström,Astrid,2",
+                "20010613-6151,Persson,Valter,1",
+            };
+
+            string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
+                schedule, FixedUIDAddon);
+
+            string[] expected =
+            {
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//hacksw/handcal//NONSGML v1.0//EN",
+                "BEGIN:VEVENT",
+                "UID:20200101T08000099@example.com",
+                "DTSTAMP:20200101T080000",
+                "DTSTART:20200101T080000",
+                "DTEND:20200101T080500",
+                "SUMMARY:19320101-1122,Svensson,Janne,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08000099@example.com",
+                "DTSTAMP:20200101T080000",
+                "DTSTART:20200101T080000",
+                "DTEND:20200101T080500",
+                "SUMMARY:19400225-1324,Jansson,Bo,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08050099@example.com",
+                "DTSTAMP:20200101T080500",
+                "DTSTART:20200101T080500",
+                "DTEND:20200101T081000",
+                "SUMMARY:19450505-1123,Bengtsson,Ulrika,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08050099@example.com",
+                "DTSTAMP:20200101T080500",
+                "DTSTART:20200101T080500",
+                "DTEND:20200101T081000",
+                "SUMMARY:19470303-1929,Hansson,Hugo,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08100099@example.com",
+                "DTSTAMP:20200101T081000",
+                "DTSTART:20200101T081000",
+                "DTEND:20200101T081500",
+                "SUMMARY:19801111-1634,Olsson,Selma,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08100099@example.com",
+                "DTSTAMP:20200101T081000",
+                "DTSTART:20200101T081000",
+                "DTEND:20200101T081500",
+                "SUMMARY:19810324-1632,Lindqvist,Alma,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08150099@example.com",
+                "DTSTAMP:20200101T081500",
+                "DTSTART:20200101T081500",
+                "DTEND:20200101T082000",
+                "SUMMARY:19890419-2934,Sandberg,Noah,Doser=1",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08150099@example.com",
+                "DTSTAMP:20200101T081500",
+                "DTSTART:20200101T081500",
+                "DTEND:20200101T082000",
+                "SUMMARY:19910911-3922,Berg,Lilly,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08200099@example.com",
+                "DTSTAMP:20200101T082000",
+                "DTSTART:20200101T082000",
+                "DTEND:20200101T082500",
+                "SUMMARY:19990720-5443,Engström,Astrid,Doser=2",
+                "END:VEVENT",
+                "BEGIN:VEVENT",
+                "UID:20200101T08200099@example.com",
+                "DTSTAMP:20200101T082000",
+                "DTSTART:20200101T082000",
+                "DTEND:20200101T082500",
+                "SUMMARY:20010613-6151,Persson,Valter,Doser=1",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            };
+
+            CollectionAssert.AreEqual(expected, result);
         }
     }
 }
