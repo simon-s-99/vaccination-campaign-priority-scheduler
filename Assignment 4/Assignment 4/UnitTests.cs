@@ -479,18 +479,25 @@ namespace Test
 
             string[] priorityOrder = Array.Empty<string>();
 
+            string[] result = Array.Empty<string>();
+
             try
             {
-                string[] result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
+                result = Schedule.SubMenu.PriorityOrderToICSRawText(priorityOrder,
                     schedule, FixedUIDAddon);
             }
             catch (ArgumentException)
             {
-                Assert.AreEqual(true, true);
+                Assert.AreEqual(true, true); // pass test, ArgumentException is expected behaviour
             }
             catch
             {
                 Assert.AreEqual(true, false); // fail test if any other type of argument is thrown 
+            }
+
+            if (result != priorityOrder)
+            {
+                Assert.AreEqual(true, false); // fail test if result[] is not empty 
             }
         }
     }
