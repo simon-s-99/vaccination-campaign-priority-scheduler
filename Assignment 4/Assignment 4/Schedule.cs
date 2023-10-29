@@ -130,7 +130,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch (FormatException)
+                catch 
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
@@ -166,7 +166,7 @@ namespace Schedule
                 {
                     time = TimeSpan.ParseExact(input, "h\\:mm", null);
                 }
-                catch (FormatException)
+                catch 
                 {
                     Console.WriteLine("Felaktigt tidsformat. Använd formatet: HH:mm (timmar:minuter).");
                 }
