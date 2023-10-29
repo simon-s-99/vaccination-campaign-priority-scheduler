@@ -1,13 +1,7 @@
-﻿using Microsoft.VisualStudio.TestPlatform.TestHost;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vaccination;
-using static System.Net.Mime.MediaTypeNames;
 
 // Samuel Lööf & Simon Sörqvist, uppgift 4
 
